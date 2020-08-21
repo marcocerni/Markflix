@@ -4,14 +4,114 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-		<style>
-			body { margin: 0; }
-			canvas { display: block; }
-		</style>
-    <title>Three JS</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
+    <title></title>
   </head>
   <body>
-    <script src="public/bundle.js"></script>
+  <nav class="sidenav">
+    <form class="needs-validation" novalidate="">
+
+      <div class="text-center">
+        <h1>GEL + FRANCE</h1>
+        <h2 class="lead">GEL CREATOR</h2>
+      </div>
+
+      <div class="form-group mb-2">
+        <label for="logo-file" class="lead">Image Logo</label>
+        <div class="input-group">
+          <div class="custom-file">
+            <input type="file" class="custom-file-input" id="logo-file" name="logo-file" aria-describedby="logo-file" accept="image/x-png,image/gif,image/jpeg">
+            <label class="custom-file-label" for="logo-file"></label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="sides-opacity" class="lead">Opacité Strie</label>
+        <input type="range" class="form-control-range" id="sides-opacity" name="sides-opacity" value="100">
+      </div>
+
+      <hr class="mb-2">
+
+      <label class="lead">Fond Face</label>
+
+      <div class="input-group mb-2">
+        <div class="input-group-prepend">
+          <div class="input-group-text">
+            <input type="radio" name="face" value="C" checked>
+          </div>
+        </div>
+        <input type="color" class="form-control" id="face-color" value="#ffffff" name="face-color">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <div class="input-group-text">
+            <input type="radio" name="face" value="I">
+          </div>
+        </div>
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" id="face-file" name="face-file" aria-describedby="face-input" accept="image/x-png,image/gif,image/jpeg">
+          <label class="custom-file-label" for="face-file"></label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <input type="range" class="form-control-range" id="face-opacity" name="face-opacity" value="100">
+      </div>
+
+      <hr class="mb-2">
+
+      <label class="lead">Fond Dos</label>
+
+      <div class="input-group mb-2">
+        <div class="input-group-prepend">
+          <div class="input-group-text">
+            <input type="radio" name="back" value="C" checked>
+          </div>
+        </div>
+        <input type="color" class="form-control" id="back-color" value="#ffffff" name="back-color">
+      </div>
+
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+          <div class="input-group-text">
+            <input type="radio" name="back" value="I">
+          </div>
+        </div>
+        <div class="custom-file">
+          <input type="file" class="custom-file-input" id="back-file" name="back-file" aria-describedby="back-file" accept="image/x-png,image/gif,image/jpeg">
+          <label class="custom-file-label" for="back-file"></label>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <input type="range" class="form-control-range" id="back-opacity" name="back-opacity" value="100">
+      </div>
+
+      <hr class="mb-4">
+      <button class="btn btn-primary btn-lg btn-block" type="submit" disabled>Commander</button>
+    </form>
+  </nav>
+
+  <main id="main">
+  </main>
+
+  <div class="canvas-container">
+    <div class="btn-container">
+      <a class="btn btn-primary btn-download" type="submit" id="download-front">Télécharger</a>
+    </div>
+    <canvas id="canvas-front"></canvas>
+    <div class="btn-container">
+      <a class="btn btn-primary btn-download" type="submit" id="download-back">Télécharger</a>
+    </div>
+    <canvas id="canvas"></canvas>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+  <script src="public/bundle.js"></script>
   </body>
 </html>
