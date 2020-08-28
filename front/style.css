@@ -5,16 +5,16 @@ body {
 .sidenav {
     width: 400px;
     padding: 20px;
-    position: fixed;
+    position: absolute;
     z-index: 1;
     top: 20px;
     left: 20px;
     background: #eef7fc;
     border-radius: 10px;
     color: #205685;
-    -webkit-box-shadow: 0px 0px 17px -5px rgba(0,0,0,0.75);
-    -moz-box-shadow: 0px 0px 17px -5px rgba(0,0,0,0.75);
-    box-shadow: 0px 0px 17px -5px rgba(0,0,0,0.75);
+    -webkit-box-shadow: 0px 0px 17px -5px rgba(0, 0, 0, 0.75);
+    -moz-box-shadow: 0px 0px 17px -5px rgba(0, 0, 0, 0.75);
+    box-shadow: 0px 0px 17px -5px rgba(0, 0, 0, 0.75);
 }
 
 .canvas-container {
@@ -70,6 +70,16 @@ body {
 }
 
 @media screen and (max-height: 450px) {
-    .sidenav {padding-top: 15px;}
-    .sidenav a {font-size: 18px;}
+    .sidenav {
+        padding-top: 15px;
+    }
+
+    .sidenav a {
+        font-size: 18px;
+    }
+}
+
+.custom-file-label {
+    white-space: nowrap;
+    overflow: hidden;
 }
