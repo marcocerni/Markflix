@@ -1,0 +1,42 @@
+{
+  "name": "venturing-backend-starter",
+  "version": "1.0.0",
+  "description": "BackEnd project starter: Express, TypeScript, TypeORM, passport and others.",
+  "devDependencies": {
+    "ts-node": "8.10.2",
+    "@types/node": "^14.0.13",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/body-parser": "^1.19.0",
+    "@types/cors": "^2.8.6",
+    "@types/helmet": "0.0.47",
+    "@types/jsonwebtoken": "^8.5.0",
+    "typescript": "3.9.5"
+  },
+  "dependencies": {
+    "@types/multer": "^1.4.4",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.19.0",
+    "class-validator": "^0.12.2",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "helmet": "^3.23.0",
+    "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.2",
+    "mysql": "^2.18.1",
+    "nodemailer": "^6.4.11",
+    "path": "^0.12.7",
+    "reflect-metadata": "^0.1.13",
+    "sharp": "^0.26.0",
+    "ts-node-dev": "^1.0.0-pre.49",
+    "tslib": "^2.0.1",
+    "typeorm": "0.2.25",
+    "uuid": "^8.3.0"
+  },
+  "scripts": {
+    "tsc": "tsc",
+    "start": "set debug=* && ts-node-dev --respawn --transpileOnly ./src/index.ts",
+    "prod": "tsc && node ./build/index.js",
+    "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run",
+    "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync"
+  }
+}

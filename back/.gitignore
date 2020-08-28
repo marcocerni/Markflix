@@ -1,0 +1,21 @@
+# Logs
+*.log
+logs/
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# dotenv environment variables file
+.env
+
+# IDEs
+.idea/
+.vscode/
+
+# Build directory
+dist/
+build/
+tmp/
+temp/
+/node_modules/
