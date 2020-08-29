@@ -24,7 +24,7 @@ body {
 
 @media only screen and (max-width: 600px) {
     .sidenav {
-        padding-bottom: 600px;
+        padding-bottom: calc(100vh - 70px);
     }
 
     .sidenav form h1 {

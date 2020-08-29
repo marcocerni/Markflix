@@ -458,12 +458,12 @@ document.getElementById('download-front').addEventListener('click', function() {
 $('form').submit(function(e) {
   e.preventDefault()
 
-  const $this = $(this)
+  const $button = $(this).find('[type="submit"]')
 
-  const oldContent = $this.html()
+  const oldContent = $button.html()
 
-  $this.append(' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
-  $this.prop('disabled', true)
+  $button.html(oldContent+' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+  $button.prop('disabled', true)
 
   $.ajax({
     url: sachetId ? `${sachetUrl}/${sachetId}` : sachetUrl,
@@ -477,13 +477,13 @@ $('form').submit(function(e) {
       const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?id=' + sachet.id
       window.history.pushState({ path: newUrl }, 'GEL + FRANCE - Gel Creator', newUrl)
 
-      // $this.html(oldContent)
-      $this.prop('disabled', false)
+      $button.html(oldContent)
+      $button.prop('disabled', false)
     },
     error: function(error) {
       console.error(error)
-      // $this.html(oldContent)
-      $this.prop('disabled', false)
+      $button.html(oldContent)
+      $button.prop('disabled', false)
     },
   });
 
