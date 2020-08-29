@@ -475,5 +475,7 @@ $('form').submit(function(e) {
       $this.html(oldContent)
       $this.prop('disabled', false)
     },
-  })
+  });
+
+  return false;
 })
