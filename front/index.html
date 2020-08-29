@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css?v=1">
     <title>GEL + FRANCE - Gel Creator</title>
   </head>
   <body>
+
   <nav class="sidenav">
     <form class="needs-validation" method="post" enctype="multipart/form-data">
 
@@ -102,10 +103,13 @@
   <main id="main">
   </main>
 
-  <div class="canvas-container">
-    <div class="btn-container">
-      <a class="btn btn-primary btn-download" type="submit" id="download-front">Télécharger</a>
-    </div>
+  <div class="btn-container">
+    <a class="btn btn-secondary" data-toggle="collapse" href="#the-canvas" role="button" aria-expanded="false" aria-controls="collapseExample">
+      Image
+    </a>
+    <a class="btn btn-primary btn-download" type="submit" id="download-front">Télécharger</a>
+  </div>
+  <div class="canvas-container collapse" id="the-canvas">
     <canvas id="canvas-front"></canvas>
     <canvas id="canvas"></canvas>
   </div>

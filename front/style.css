@@ -4,11 +4,16 @@ body {
 
 .sidenav {
     width: 400px;
-    padding: 20px;
+    max-width: calc(100% - 40px);
     position: absolute;
     z-index: 1;
     top: 20px;
     left: 20px;
+    margin-bottom: 20px;
+}
+
+.sidenav form {
+    padding: 20px;
     background: #eef7fc;
     border-radius: 10px;
     color: #205685;
@@ -17,8 +22,15 @@ body {
     box-shadow: 0px 0px 17px -5px rgba(0, 0, 0, 0.75);
 }
 
+@media only screen and (max-width: 600px) {
+    .sidenav {
+        padding-bottom: 600px;
+    }
+}
+
 .canvas-container {
     width: 400px;
+    max-width: calc(100% - 40px);
     position: absolute;
     z-index: 1;
     top: 20px;
@@ -28,12 +40,13 @@ body {
     margin-bottom: 20px;
 }
 
-.canvas-container .btn-container {
+.btn-container {
     position: relative;
-    top: 20px;
-    right: 15px;
+    top: 40px;
+    right: 30px;
     float: right;
     height: 0;
+    z-index: 2;
 }
 
 #canvas {

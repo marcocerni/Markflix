@@ -124,6 +124,16 @@ function init() {
   animate()
 }
 
+window.addEventListener( 'resize', function onWindowResize(){
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+}, false );
+
+
+
 function loadTexture(uri, front = true) {
   return new Promise((resolve, reject) => {
     textureLoader.load(uri, (texture) => {
@@ -467,12 +477,12 @@ $('form').submit(function(e) {
       const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?id=' + sachet.id
       window.history.pushState({ path: newUrl }, 'GEL + FRANCE - Gel Creator', newUrl)
 
-      $this.html(oldContent)
+      // $this.html(oldContent)
       $this.prop('disabled', false)
     },
     error: function(error) {
       console.error(error)
-      $this.html(oldContent)
+      // $this.html(oldContent)
       $this.prop('disabled', false)
     },
   });
