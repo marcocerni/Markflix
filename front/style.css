@@ -26,6 +26,10 @@ body {
     .sidenav {
         padding-bottom: 600px;
     }
+
+    .sidenav form h1 {
+        margin-top: 50px;
+    }
 }
 
 .canvas-container {
