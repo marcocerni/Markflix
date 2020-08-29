@@ -3,4 +3,6 @@ example
 .idea
 public/images
 public/config.js
+public/bundle.js
 config.js
+v8-compile-cache-0

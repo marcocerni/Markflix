@@ -86,7 +86,7 @@ class SachetController {
     sachet.frontColor = req.body['face-font-color']
     sachet.email = req.body['email']
 
-    return Promise.all(req.files.map(async (file) => {
+    return Promise.all((req.files as any).map(async (file) => {
       if (file.fieldname === 'logo-file') {
         if (sachet.logo) {
           ImageService.deleteImage(sachet.logo);
