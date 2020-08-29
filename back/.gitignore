@@ -19,3 +19,5 @@ build/
 tmp/
 temp/
 /node_modules/
+
+src/config/config.ts

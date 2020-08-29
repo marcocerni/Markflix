@@ -3,6 +3,7 @@ import { getRepository } from 'typeorm'
 import { validate } from 'class-validator'
 import { Sachet } from '../entity/Sachet'
 import { ImageService } from '../services/ImageService'
+import { EmailService } from '../services/MailService'
 
 class SachetController {
 
@@ -20,6 +21,7 @@ class SachetController {
         'frontBackgroundColor',
         'frontBackgroundOpacity',
         'frontColor',
+        'email'
       ],
     })
 
@@ -43,6 +45,7 @@ class SachetController {
           'frontBackgroundColor',
           'frontBackgroundOpacity',
           'frontColor',
+          'email'
         ],
       })
       res.send(sachet)
@@ -67,6 +70,8 @@ class SachetController {
     } catch (e) {
       return res.status(409).send('id already in use')
     }
+
+    const result = await EmailService.sendNewSachetCreatedEmail(sachet);
 
     res.status(200).send(sachet)
   }

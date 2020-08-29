@@ -22,7 +22,6 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 //https://stackoverflow.com/questions/19351419/exporting-threejs-scene-to-obj-format
 
-const sachetUrl = 'http://localhost:3000/sachet'
 const imagePublicPath = 'public/images'
 
 const mtlLoader = new MTLLoader()
@@ -182,6 +181,7 @@ const parameters = {
   'back-file': null,
   'back-opacity': 100,
   'back-font-color': '#000000',
+  'email': null,
 }
 
 function loadSachet(id) {
@@ -189,14 +189,15 @@ function loadSachet(id) {
     url: `${sachetUrl}/${id}`,
     type: 'GET',
     success: function(sachet) {
-      console.log(sachet)
-
       parameters['logo-file'] = sachet.logo ? `${imagePublicPath}/${sachet.logo}` : null
       $('[name="logo-file"]').next('label').html(sachet.logo)
+      $('[name="logo-file"]').prop('required', sachet.logo == null)
       parameters['face-file'] = sachet.frontBackground ? `${imagePublicPath}/${sachet.frontBackground}` : null
       $('[name="face-file"]').next('label').html(sachet.frontBackground)
+      // $('[name="face-file"]').prop('required', sachet.frontBackground == null)
       parameters['back-file'] = sachet.backBackground ? `${imagePublicPath}/${sachet.backBackground}` : null
       $('[name="back-file"]').next('label').html(sachet.backBackground)
+      // $('[name="back-file"]').prop('required', sachet.backBackground == null)
 
       parameters['sides-opacity'] = sachet.opacity
       $('[name="sides-opacity"]').val(sachet.opacity)
@@ -215,7 +216,8 @@ function loadSachet(id) {
       parameters['back-font-color'] = sachet.backColor
       $('[name="back-font-color"]').val(sachet.backColor)
 
-      console.log(parameters)
+      parameters['email'] = sachet.email
+      $('[name="email"]').val(sachet.email)
 
       updateCanvasFront()
       updateCanvas()
@@ -448,11 +450,10 @@ $('form').submit(function(e) {
 
   const $this = $(this)
 
-  const oldContent = $this.html();
+  const oldContent = $this.html()
 
-  $this.append('<span class="spinner-border text-light" role="status">\n' +
-    '  <span class="sr-only">Loading...</span>\n' +
-    '</span>');
+  $this.append(' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+  $this.prop('disabled', true)
 
   $.ajax({
     url: sachetId ? `${sachetUrl}/${sachetId}` : sachetUrl,
@@ -467,10 +468,12 @@ $('form').submit(function(e) {
       window.history.pushState({ path: newUrl }, 'GEL + FRANCE - Gel Creator', newUrl)
 
       $this.html(oldContent)
+      $this.prop('disabled', false)
     },
     error: function(error) {
       console.error(error)
       $this.html(oldContent)
+      $this.prop('disabled', false)
     },
   })
 })

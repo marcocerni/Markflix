@@ -2,3 +2,5 @@ node_modules
 example
 .idea
 public/images
+public/config.js
+config.js

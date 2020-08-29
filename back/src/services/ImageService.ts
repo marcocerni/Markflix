@@ -45,11 +45,13 @@ class ImageResizeProvider {
     const filename = ImageResizeProvider.filename()
     const filepath = this.filepath(filename)
     await sharp(buffer)
+      .rotate()
       .png({ compressionLevel: 9, adaptiveFiltering: true, force: true })
       .resize(800, 800, {
         fit: sharp.fit.inside,
         withoutEnlargement: true,
       })
+      .withMetadata()
       .toFile(filepath)
 
     return filename
