@@ -124,14 +124,13 @@ function init() {
   animate()
 }
 
-window.addEventListener( 'resize', function onWindowResize(){
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
+window.addEventListener('resize', function onWindowResize() {
+  camera.aspect = window.innerWidth / window.innerHeight
+  camera.updateProjectionMatrix()
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setSize(window.innerWidth, window.innerHeight)
 
-}, false );
-
+}, false)
 
 
 function loadTexture(uri, front = true) {
@@ -147,12 +146,13 @@ function loadTexture(uri, front = true) {
     }, null, (error) => {
       reject(error)
     })
-  }).then(() => {
-    return loadImage(uri).then((image) => {
-      const dx = front ? 0 : CANVAS_WIDTH
-      cctx.drawImage(image, dx, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-    })
   })
+  //   .then(() => {
+  //   return loadImage(uri).then((image) => {
+  //     const dx = front ? 0 : CANVAS_WIDTH
+  //     cctx.drawImage(image, dx, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+  //   })
+  // })
 }
 
 function render() {
@@ -269,7 +269,6 @@ function filterImage(image, color) {
   // reset comp. mode to default
   cctx.globalCompositeOperation = 'source-over'
 
-
   return loadImage(c.toDataURL())
 }
 
@@ -314,11 +313,20 @@ const updateCanvas = async () => {
   context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
   context.globalCompositeOperation = 'destination-in'
 
+  cctx.clearRect(CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+
   canvas.width = CANVAS_WIDTH
   canvas.height = CANVAS_HEIGHT
 
-  context.fillStyle = parameters['back-color']
+  const backgroundColor = parameters['back-color']
+
+  context.fillStyle = backgroundColor
   context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+
+  if (backgroundColor !== '#ffffff') {
+    cctx.fillStyle = backgroundColor
+    cctx.fillRect(CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+  }
 
   const backgroundImage = parameters['back-file']
 
@@ -327,6 +335,10 @@ const updateCanvas = async () => {
       context.globalAlpha = parameters['back-opacity'] / 100
       context.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
       context.globalAlpha = 1
+
+      cctx.globalAlpha = parameters['back-opacity'] / 100
+      cctx.drawImage(image, CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+      cctx.globalAlpha = 1
     })
   }
 
@@ -351,6 +363,7 @@ const updateCanvas = async () => {
 
         } else {
           context.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+          cctx.drawImage(image, CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
         }
       })
     }).then(() => {
@@ -361,6 +374,7 @@ const updateCanvas = async () => {
 }
 
 // const LOGO_CENTER_X = 2217 (665), LOGO_CENTER_Y = 3000, LOGO_MAX_WIDTH = 3000, LOGO_MAX_HEIGHT = 4000
+
 const LOGO_CENTER_X = 665, LOGO_CENTER_Y = 900, LOGO_MAX_WIDTH = 900, LOGO_MAX_HEIGHT = 1200
 const CANVAS_WIDTH = 1330, CANVAS_HEIGHT = 2177
 const cResult = document.createElement('canvas')
@@ -378,11 +392,20 @@ const updateCanvasFront = async () => {
   contextFront.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
   contextFront.globalCompositeOperation = 'destination-in'
 
+  cctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+
   canvasFront.width = CANVAS_WIDTH
   canvasFront.height = CANVAS_HEIGHT
 
-  contextFront.fillStyle = parameters['face-color']
+  const backgroundColor = parameters['face-color']
+
+  contextFront.fillStyle = backgroundColor
   contextFront.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+
+  if (backgroundColor !== '#ffffff') {
+    cctx.fillStyle = backgroundColor
+    cctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+  }
 
   const backgroundImage = parameters['face-file']
 
@@ -391,6 +414,10 @@ const updateCanvasFront = async () => {
       contextFront.globalAlpha = parameters['face-opacity'] / 100
       contextFront.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
       contextFront.globalAlpha = 1
+
+      cctx.globalAlpha = parameters['face-opacity'] / 100
+      cctx.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+      cctx.globalAlpha = 1
     })
   }
 
@@ -415,7 +442,7 @@ const updateCanvasFront = async () => {
           contextFront.globalAlpha = 1
 
         } else if (index === images.length - 1) {
-          const wider = image.width > image.height
+          const wider = (image.width / LOGO_MAX_WIDTH) > (image.height / LOGO_MAX_HEIGHT)
           let width, height
           if (wider) {
             width = LOGO_MAX_WIDTH
@@ -429,9 +456,11 @@ const updateCanvasFront = async () => {
           const dy = LOGO_CENTER_Y - (height / 2)
 
           contextFront.drawImage(image, dx, dy, width, height)
+          cctx.drawImage(image, dx, dy, width, height)
         } else {
 
           contextFront.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+          cctx.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
         }
       })
     }).then(() => {
@@ -462,7 +491,7 @@ $('form').submit(function(e) {
 
   const oldContent = $button.html()
 
-  $button.html(oldContent+' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+  $button.html(oldContent + ' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
   $button.prop('disabled', true)
 
   $.ajax({
@@ -485,7 +514,7 @@ $('form').submit(function(e) {
       $button.html(oldContent)
       $button.prop('disabled', false)
     },
-  });
+  })
 
-  return false;
+  return false
 })

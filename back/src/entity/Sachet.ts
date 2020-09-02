@@ -9,8 +9,8 @@ import {Length} from "class-validator";
 
 @Entity()
 export class Sachet {
-    @PrimaryGeneratedColumn("uuid")
-    id: string;
+    @PrimaryGeneratedColumn()
+    id: number;
 
     @Column()
     @Length(4, 100)
