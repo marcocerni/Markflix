@@ -72,6 +72,7 @@ class SachetController {
     }
 
     const result = await EmailService.sendNewSachetCreatedEmail(sachet);
+    const result2 = await EmailService.sendNewSachetCreatedEmailClient(sachet);
 
     res.status(200).send(sachet)
   }

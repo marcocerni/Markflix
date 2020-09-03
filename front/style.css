@@ -12,7 +12,7 @@ body {
     margin-bottom: 20px;
 }
 
-.sidenav form {
+.sidenav .form-container {
     padding: 20px;
     background: #eef7fc;
     border-radius: 10px;
@@ -27,9 +27,13 @@ body {
         padding-bottom: calc(100vh - 70px);
     }
 
-    .sidenav form h1 {
+    .sidenav .form-container h1 {
         margin-top: 50px;
     }
+}
+
+.sidenav .result-container {
+    display: none;
 }
 
 .canvas-container {
@@ -67,18 +71,6 @@ body {
 
 .sidenav label {
     margin-bottom: 0;
-}
-
-.sidenav a {
-    padding: 6px 8px 6px 16px;
-    text-decoration: none;
-    font-size: 25px;
-    color: #2196F3;
-    display: block;
-}
-
-.sidenav a:hover {
-    color: #064579;
 }
 
 #main {

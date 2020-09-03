@@ -1,123 +1,144 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css?v=1">
     <title>GEL + FRANCE - Gel Creator</title>
-  </head>
-  <body>
+</head>
+<body>
 
-  <nav class="sidenav">
-    <form class="needs-validation" method="post" enctype="multipart/form-data">
+<nav class="sidenav">
 
-      <div class="text-center">
-        <h1>GEL + FRANCE</h1>
-        <h2 class="lead">GEL CREATOR</h2>
-      </div>
+    <div class="form-container">
 
-      <div class="form-group mb-2">
-        <label for="logo-file" class="lead">Image Logo</label>
-        <div class="input-group">
-          <div class="custom-file">
-            <input type="file" class="custom-file-input" id="logo-file" name="logo-file" aria-describedby="logo-file" accept="image/x-png,image/gif,image/jpeg" required="required">
-            <label class="custom-file-label" for="logo-file"></label>
-          </div>
+        <div class="text-center">
+            <h1>GEL + FRANCE</h1>
+            <h2 class="lead">GEL CREATOR</h2>
         </div>
+
+        <form class="needs-validation" method="post" enctype="multipart/form-data">
+
+            <div class="form-group mb-2">
+                <label for="logo-file" class="lead">Image Logo</label>
+                <div class="input-group">
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="logo-file" name="logo-file"
+                               aria-describedby="logo-file" accept="image/x-png,image/gif,image/jpeg">
+                        <label class="custom-file-label" for="logo-file"></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="sides-opacity" class="lead">Opacité Strie</label>
+                <input type="range" class="form-control-range" id="sides-opacity" name="sides-opacity" value="100">
+            </div>
+
+            <hr class="mb-2">
+
+            <label class="lead">Fond Face</label>
+
+            <div class="input-group mb-2">
+                <input type="color" class="form-control" id="face-color" value="#ffffff" name="face-color">
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="face-file" name="face-file"
+                           aria-describedby="face-input" accept="image/x-png,image/gif,image/jpeg">
+                    <label class="custom-file-label" for="face-file"></label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="range" class="form-control-range" id="face-opacity" name="face-opacity" value="100">
+            </div>
+
+            <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <label>Police</label>
+                    </div>
+                </div>
+                <input type="color" class="form-control" id="face-font-color" value="#000000" name="face-font-color">
+            </div>
+
+            <hr class="mb-2">
+
+            <label class="lead">Fond Dos</label>
+
+            <div class="input-group mb-2">
+                <input type="color" class="form-control" id="back-color" value="#ffffff" name="back-color">
+            </div>
+
+            <div class="input-group mb-3">
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="back-file" name="back-file"
+                           aria-describedby="back-file" accept="image/x-png,image/gif,image/jpeg">
+                    <label class="custom-file-label" for="back-file"></label>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <input type="range" class="form-control-range" id="back-opacity" name="back-opacity" value="100">
+            </div>
+
+            <div class="input-group mb-2">
+                <div class="input-group-prepend">
+                    <div class="input-group-text">
+                        <label>Police</label>
+                    </div>
+                </div>
+                <input type="color" class="form-control" id="back-font-color" value="#000000" name="back-font-color">
+            </div>
+
+            <hr class="mb-4">
+
+
+            <div class="form-group">
+                <input type="email" class="form-control" name="email" placeholder="Email" required>
+            </div>
+
+            <button class="btn btn-primary btn-lg btn-block" type="submit">Envoyer</button>
+        </form>
+
+      <div class="py-2 result-container">
+        <p class="lead text-center">Email envoyé! Votre code Sachet est:<br> <b class="sachet_code">1231</b></p>
+        <a class="btn btn-success btn-lg btn-block"
+           href="https://www.gelplusfrance.com/product-page/sachet-personnalisable" target="_blank">Commander</a>
       </div>
 
-      <div class="form-group">
-        <label for="sides-opacity" class="lead">Opacité Strie</label>
-        <input type="range" class="form-control-range" id="sides-opacity" name="sides-opacity" value="100">
-      </div>
 
-      <hr class="mb-2">
+    </div>
+</nav>
 
-      <label class="lead">Fond Face</label>
+<main id="main">
+</main>
 
-      <div class="input-group mb-2">
-        <input type="color" class="form-control" id="face-color" value="#ffffff" name="face-color">
-      </div>
-
-      <div class="input-group mb-3">
-        <div class="custom-file">
-          <input type="file" class="custom-file-input" id="face-file" name="face-file" aria-describedby="face-input" accept="image/x-png,image/gif,image/jpeg">
-          <label class="custom-file-label" for="face-file"></label>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <input type="range" class="form-control-range" id="face-opacity" name="face-opacity" value="100">
-      </div>
-
-      <div class="input-group mb-2">
-        <div class="input-group-prepend">
-          <div class="input-group-text">
-            <label>Police</label>
-          </div>
-        </div>
-        <input type="color" class="form-control" id="face-font-color" value="#000000" name="face-font-color">
-      </div>
-
-      <hr class="mb-2">
-
-      <label class="lead">Fond Dos</label>
-
-      <div class="input-group mb-2">
-        <input type="color" class="form-control" id="back-color" value="#ffffff" name="back-color">
-      </div>
-
-      <div class="input-group mb-3">
-        <div class="custom-file">
-          <input type="file" class="custom-file-input" id="back-file" name="back-file" aria-describedby="back-file" accept="image/x-png,image/gif,image/jpeg">
-          <label class="custom-file-label" for="back-file"></label>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <input type="range" class="form-control-range" id="back-opacity" name="back-opacity" value="100">
-      </div>
-
-      <div class="input-group mb-2">
-        <div class="input-group-prepend">
-          <div class="input-group-text">
-            <label>Police</label>
-          </div>
-        </div>
-        <input type="color" class="form-control" id="back-font-color" value="#000000" name="back-font-color">
-      </div>
-
-      <hr class="mb-4">
-
-
-      <div class="form-group">
-        <input type="email" class="form-control" name="email" placeholder="Email" required>
-      </div>
-
-      <button class="btn btn-primary btn-lg btn-block" type="submit">Sauvegarder</button>
-    </form>
-  </nav>
-
-  <main id="main">
-  </main>
-
-  <div class="btn-container">
-    <a class="btn btn-secondary" data-toggle="collapse" href="#the-canvas" role="button" aria-expanded="false" aria-controls="collapseExample">
-      Image
+<div class="btn-container">
+    <a class="btn btn-secondary" data-toggle="collapse" href="#the-canvas" role="button" aria-expanded="false"
+       aria-controls="collapseExample">
+        Image
     </a>
     <a class="btn btn-primary btn-download" type="submit" id="download-front">Télécharger</a>
-  </div>
-  <div class="canvas-container collapse" id="the-canvas">
+</div>
+<div class="canvas-container collapse" id="the-canvas">
     <canvas id="canvas-front"></canvas>
     <canvas id="canvas"></canvas>
-  </div>
+</div>
 
-  <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
-  <script src="public/config.js"></script>
-  <script src="public/bundle.js"></script>
-  </body>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+        crossorigin="anonymous"></script>
+<script src="public/config.js"></script>
+<script src="public/bundle.js"></script>
+</body>
 </html>

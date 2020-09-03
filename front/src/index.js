@@ -201,7 +201,7 @@ function loadSachet(id) {
     success: function(sachet) {
       parameters['logo-file'] = sachet.logo ? `${imagePublicPath}/${sachet.logo}` : null
       $('[name="logo-file"]').next('label').html(sachet.logo)
-      $('[name="logo-file"]').prop('required', sachet.logo == null)
+      // $('[name="logo-file"]').prop('required', sachet.logo == null)
       parameters['face-file'] = sachet.frontBackground ? `${imagePublicPath}/${sachet.frontBackground}` : null
       $('[name="face-file"]').next('label').html(sachet.frontBackground)
       // $('[name="face-file"]').prop('required', sachet.frontBackground == null)
@@ -320,12 +320,15 @@ const updateCanvas = async () => {
 
   const backgroundColor = parameters['back-color']
 
-  context.fillStyle = backgroundColor
+  context.fillStyle = '#ffffff'
   context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+
+  context.fillStyle = backgroundColor
+  context.fillRect(DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
 
   if (backgroundColor !== '#ffffff') {
     cctx.fillStyle = backgroundColor
-    cctx.fillRect(CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+    cctx.fillRect(CANVAS_WIDTH + DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
   }
 
   const backgroundImage = parameters['back-file']
@@ -377,6 +380,10 @@ const updateCanvas = async () => {
 
 const LOGO_CENTER_X = 665, LOGO_CENTER_Y = 900, LOGO_MAX_WIDTH = 900, LOGO_MAX_HEIGHT = 1200
 const CANVAS_WIDTH = 1330, CANVAS_HEIGHT = 2177
+const BORDER_WIDTH = 200, BORDER_HEIGHT = 200
+const DX = BORDER_WIDTH, DY = BORDER_HEIGHT, BACKGROUND_WIDTH = CANVAS_WIDTH - (2 * BORDER_WIDTH),
+  BACKGROUND_HEIGHT = CANVAS_HEIGHT - (2 * BORDER_HEIGHT)
+
 const cResult = document.createElement('canvas')
 const cctx = cResult.getContext('2d')
 cctx.globalCompositeOperation = 'source-over'
@@ -399,12 +406,15 @@ const updateCanvasFront = async () => {
 
   const backgroundColor = parameters['face-color']
 
-  contextFront.fillStyle = backgroundColor
+  contextFront.fillStyle = '#ffffff'
   contextFront.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+
+  contextFront.fillStyle = backgroundColor
+  contextFront.fillRect(DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
 
   if (backgroundColor !== '#ffffff') {
     cctx.fillStyle = backgroundColor
-    cctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+    cctx.fillRect(DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
   }
 
   const backgroundImage = parameters['face-file']
@@ -421,11 +431,23 @@ const updateCanvasFront = async () => {
     })
   }
 
-  const logoImage = parameters['logo-file'] || 'objects/logoExample.png'
-  const imageSources = ['objects/face/stridePicFace.png', 'objects/face/DessinFace.png', 'objects/face/TextFace.png', logoImage]
+
+  let logoImage = parameters['logo-file']
+
+  if (!logoImage && !backgroundImage) {
+    logoImage = 'objects/logoExample.png'
+  }
+
+  const imageSources = ['objects/face/stridePicFace.png', 'objects/face/DessinFace.png', 'objects/face/TextFace.png']
+
+  if (logoImage) {
+    imageSources.push(logoImage)
+  }
 
   await Promise.all(imageSources.map((image, index) => {
-    if (index !== imageSources.length - 2) {
+    const textImageIndex = imageSources.length - (logoImage ? 2 : 1)
+
+    if (index !== textImageIndex) {
       return loadImage(image)
     } else {
       return loadImage(image).then((image) => {
@@ -441,7 +463,7 @@ const updateCanvasFront = async () => {
           contextFront.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
           contextFront.globalAlpha = 1
 
-        } else if (index === images.length - 1) {
+        } else if (index === images.length - 1 && logoImage) {
           const wider = (image.width / LOGO_MAX_WIDTH) > (image.height / LOGO_MAX_HEIGHT)
           let width, height
           if (wider) {
@@ -471,8 +493,23 @@ const updateCanvasFront = async () => {
 }
 
 let sachetId = getUrlParameter('id')
+let editable = getUrlParameter('uxv')
+
+function updateFormResult(animate = false) {
+  if (sachetId && !editable) {
+    $('.sachet_code').html(sachetId)
+    if (animate) {
+      $('form').slideUp()
+      $('.result-container').slideDown()
+    } else {
+      $('form').hide()
+      $('.result-container').show()
+    }
+  }
+}
 
 if (sachetId) {
+  updateFormResult()
   loadSachet(sachetId)
 } else {
   updateCanvasFront()
@@ -508,6 +545,8 @@ $('form').submit(function(e) {
 
       $button.html(oldContent)
       $button.prop('disabled', false)
+
+      updateFormResult(true)
     },
     error: function(error) {
       console.error(error)
