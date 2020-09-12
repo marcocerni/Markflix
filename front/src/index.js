@@ -182,7 +182,7 @@ const contextFront = canvasFront.getContext('2d')
 
 const parameters = {
   'logo-file': null,
-  'sides-opacity': 100,
+  'sides-opacity': 50,
   'face-color': '#ffffff',
   'face-file': null,
   'face-opacity': 100,
@@ -508,9 +508,15 @@ function updateFormResult(animate = false) {
   }
 }
 
+function showSachetId(sachetId) {
+  $('.sachet-id span').text(sachetId);
+  $('.sachet-id').addClass('show');
+}
+
 if (sachetId) {
   updateFormResult()
   loadSachet(sachetId)
+  showSachetId(sachetId)
 } else {
   updateCanvasFront()
   updateCanvas()
@@ -541,10 +547,12 @@ $('form').submit(function(e) {
     success: function(sachet) {
       sachetId = sachet.id
       const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?id=' + sachet.id
-      window.history.pushState({ path: newUrl }, 'GEL + FRANCE - Gel Creator', newUrl)
+      window.history.pushState({ path: newUrl }, 'GEL + FRANCE - Configurateur 3D', newUrl)
 
       $button.html(oldContent)
       $button.prop('disabled', false)
+
+      showSachetId(sachetId)
 
       updateFormResult(true)
     },
@@ -557,3 +565,8 @@ $('form').submit(function(e) {
 
   return false
 })
+
+$('.btn-back').click(function() {
+  const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?uxv&id=' + sachetId
+  window.location.href = newUrl
+});

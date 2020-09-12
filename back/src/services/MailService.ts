@@ -45,11 +45,11 @@ export class EmailService {
 
     const body = `<div>
         <p>Bonjour,</p>
-        <p>Vous venez de créer le sachet #<b><a href="${linkUrl}">${sachet.id}</a></b>
-        <br/>Pour commander s'il vous plait clickez sur: <a href="${buyUrl}">${buyUrl}</a>
+        <p>Veuillez trouver ci-joint le visuel 3D du sachet crée référence <b>${sachet.id}</b> : <a href="${linkUrl}">${linkUrl}</a>
+        <br/>Pour commander, cliquer sur ce lien : <a href="${buyUrl}">${buyUrl}</a>
         </p>
         <p></p>
-        <p>Cordialement<br>GEL + FRANCE</p>
+        <p>Bien Cordialement<br><a href="https://www.gelplusfrance.com/">https://www.gelplusfrance.com/</a></p>
         </div>`;
 
     return EmailService.sendMail(sachet.email, subject, body);

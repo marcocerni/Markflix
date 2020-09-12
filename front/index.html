@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css?v=1">
-    <title>GEL + FRANCE - Gel Creator</title>
+    <title>GEL + FRANCE - Configurateur 3D</title>
 </head>
 <body>
 
@@ -17,13 +17,13 @@
 
         <div class="text-center">
             <h1>GEL + FRANCE</h1>
-            <h2 class="lead">GEL CREATOR</h2>
+            <h2 class="lead">Configurateur 3D</h2>
         </div>
 
         <form class="needs-validation" method="post" enctype="multipart/form-data">
 
             <div class="form-group mb-2">
-                <label for="logo-file" class="lead">Image Logo</label>
+                <label for="logo-file" class="lead">Logo</label>
                 <div class="input-group">
                     <div class="custom-file">
                         <input type="file" class="custom-file-input" id="logo-file" name="logo-file"
@@ -33,20 +33,23 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label for="sides-opacity" class="lead">Opacité Strie</label>
-                <input type="range" class="form-control-range" id="sides-opacity" name="sides-opacity" value="100">
-            </div>
+            <!--            <div class="form-group">-->
+            <!--                <label for="sides-opacity" class="lead">Opacité Strie</label>-->
+            <!--                <input type="range" class="form-control-range" id="sides-opacity" name="sides-opacity" value="100">-->
+            <!--            </div>-->
 
             <hr class="mb-2">
 
-            <label class="lead">Fond Face</label>
+            <label class="lead">Fond Recto</label>
 
             <div class="input-group mb-2">
                 <input type="color" class="form-control" id="face-color" value="#ffffff" name="face-color">
+                <div class="input-group-append">
+                    <span class="input-group-text">Couleur</span>
+                </div>
             </div>
 
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <div class="custom-file">
                     <input type="file" class="custom-file-input" id="face-file" name="face-file"
                            aria-describedby="face-input" accept="image/x-png,image/gif,image/jpeg">
@@ -55,27 +58,28 @@
             </div>
 
             <div class="form-group">
+                <label class="">Opacité de l’image</label>
                 <input type="range" class="form-control-range" id="face-opacity" name="face-opacity" value="100">
             </div>
 
             <div class="input-group mb-2">
-                <div class="input-group-prepend">
+                <input type="color" class="form-control" id="face-font-color" value="#000000" name="face-font-color">
+                <div class="input-group-append">
                     <div class="input-group-text">
-                        <label>Police</label>
+                        <label>Couleur du texte</label>
                     </div>
                 </div>
-                <input type="color" class="form-control" id="face-font-color" value="#000000" name="face-font-color">
             </div>
 
             <hr class="mb-2">
 
-            <label class="lead">Fond Dos</label>
+            <label class="lead">Fond Verso</label>
 
             <div class="input-group mb-2">
                 <input type="color" class="form-control" id="back-color" value="#ffffff" name="back-color">
             </div>
 
-            <div class="input-group mb-3">
+            <div class="input-group mb-1">
                 <div class="custom-file">
                     <input type="file" class="custom-file-input" id="back-file" name="back-file"
                            aria-describedby="back-file" accept="image/x-png,image/gif,image/jpeg">
@@ -84,16 +88,17 @@
             </div>
 
             <div class="form-group">
+                <label class="m-0">Opacité de l’image</label>
                 <input type="range" class="form-control-range" id="back-opacity" name="back-opacity" value="100">
             </div>
 
             <div class="input-group mb-2">
-                <div class="input-group-prepend">
+                <input type="color" class="form-control" id="back-font-color" value="#000000" name="back-font-color">
+                <div class="input-group-append">
                     <div class="input-group-text">
-                        <label>Police</label>
+                        <label>Couleur du texte</label>
                     </div>
                 </div>
-                <input type="color" class="form-control" id="back-font-color" value="#000000" name="back-font-color">
             </div>
 
             <hr class="mb-4">
@@ -106,11 +111,13 @@
             <button class="btn btn-primary btn-lg btn-block" type="submit">Envoyer</button>
         </form>
 
-      <div class="py-2 result-container">
-        <p class="lead text-center">Email envoyé! Votre code Sachet est:<br> <b class="sachet_code">1231</b></p>
-        <a class="btn btn-success btn-lg btn-block"
-           href="https://www.gelplusfrance.com/product-page/sachet-personnalisable" target="_blank">Commander</a>
-      </div>
+        <div class="py-2 result-container">
+            <p class="lead text-center">Email envoyé! La référence de votre sachet personnalisé est le :<br> <b
+                    class="sachet_code">1231</b></p>
+            <a class="btn btn-success btn-lg btn-block"
+               href="https://www.gelplusfrance.com/product-page/sachet-personnalisable" target="_blank">Commander</a>
+            <button class="btn btn-link btn-lg btn-block btn-back">Back</button>
+        </div>
 
 
     </div>
@@ -120,6 +127,10 @@
 </main>
 
 <div class="btn-container">
+    <h3 class="sachet-id">
+        <span class="badge badge-pill badge-success">10232</span>
+    </h3>
+
     <a class="btn btn-secondary" data-toggle="collapse" href="#the-canvas" role="button" aria-expanded="false"
        aria-controls="collapseExample">
         Image

@@ -66,6 +66,7 @@ class SachetController {
 
     const sachetRepository = getRepository(Sachet)
     try {
+      console.log(sachet);
       await sachetRepository.save(sachet)
     } catch (e) {
       return res.status(409).send('id already in use')
@@ -78,7 +79,7 @@ class SachetController {
   }
 
   static mapRequestToSachet(req: Request, sachet: Sachet) {
-    sachet.opacity = req.body['sides-opacity']
+    sachet.opacity = req.body['sides-opacity'] ? req.body['sides-opacity'] : 50
     sachet.backBackgroundColor = req.body['back-color']
     sachet.backBackgroundOpacity = req.body['back-opacity']
     sachet.backColor = req.body['back-font-color']

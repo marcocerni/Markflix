@@ -57,6 +57,16 @@ body {
     z-index: 2;
 }
 
+.sachet-id {
+    display: none;
+    vertical-align: top;
+    margin-right: 10px;
+}
+
+.sachet-id.show {
+    display: inline-block;
+}
+
 #canvas {
     width: 400px;
     border: 1px solid #000000;
@@ -91,4 +101,10 @@ body {
 .custom-file-label {
     white-space: nowrap;
     overflow: hidden;
+}
+
+.custom-file-input.custom-file-label::after,
+.custom-file-input:lang(en)~.custom-file-label::after,
+.custom-file-input:lang(fr)~.custom-file-label::after {
+    content: 'Image'
 }
