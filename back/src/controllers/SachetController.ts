@@ -66,7 +66,6 @@ class SachetController {
 
     const sachetRepository = getRepository(Sachet)
     try {
-      console.log(sachet);
       await sachetRepository.save(sachet)
     } catch (e) {
       return res.status(409).send('id already in use')
