@@ -108,3 +108,15 @@ body {
 .custom-file-input:lang(fr)~.custom-file-label::after {
     content: 'Image'
 }
+
+.remove-button {
+    z-index: 10;
+    width: 100px;
+    font-weight: bolder;
+    position: absolute;
+    right: 0;
+}
+
+.btn-new-sachet {
+    display: none;
+}

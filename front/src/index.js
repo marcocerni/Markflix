@@ -1,7 +1,7 @@
 import {
-  AmbientLight,
+  AmbientLight, BackSide,
   Color,
-  DirectionalLight,
+  DirectionalLight, DoubleSide, FrontSide,
   GridHelper,
   Mesh,
   MeshBasicMaterial, MeshPhongMaterial,
@@ -46,6 +46,7 @@ function init() {
 
   scene = new Scene()
   scene.background = new Color(0xf0f0f0)
+  // scene.position.set( 10, 0, 0 );
 
   mtlLoader.load('objects/sachet_lowpoly.mtl', function(materials) {
     objLoader.setMaterials(materials)
@@ -57,7 +58,17 @@ function init() {
       sachet.traverse((child) => {
         if (child instanceof Mesh) {
           frontSachet = child.material[0]
+          // frontSachet.dispose()
+          // frontSachet.visible = false;
           backSachet = child.material[1]
+          // child.flipSided = true;
+          // console.log(backSachet);
+          // // console.log(backSachet.geometry);
+          // console.log(child);
+          // // backSachet.geometry.dynamic = true
+          // backSachet.flipSided = true;
+          // backSachet.clipIntersection = true;
+          // backSachet.side = DoubleSide;
         }
       })
 
@@ -201,12 +212,15 @@ function loadSachet(id) {
     success: function(sachet) {
       parameters['logo-file'] = sachet.logo ? `${imagePublicPath}/${sachet.logo}` : null
       $('[name="logo-file"]').next('label').html(sachet.logo)
+      if (sachet.logo) addCloseButtonToInput($('[name="logo-file"]')[0])
       // $('[name="logo-file"]').prop('required', sachet.logo == null)
       parameters['face-file'] = sachet.frontBackground ? `${imagePublicPath}/${sachet.frontBackground}` : null
       $('[name="face-file"]').next('label').html(sachet.frontBackground)
+      if (sachet.frontBackground) addCloseButtonToInput($('[name="face-file"]')[0])
       // $('[name="face-file"]').prop('required', sachet.frontBackground == null)
       parameters['back-file'] = sachet.backBackground ? `${imagePublicPath}/${sachet.backBackground}` : null
       $('[name="back-file"]').next('label').html(sachet.backBackground)
+      if (sachet.backBackground) addCloseButtonToInput($('[name="back-file"]')[0])
       // $('[name="back-file"]').prop('required', sachet.backBackground == null)
 
       parameters['sides-opacity'] = sachet.opacity
@@ -214,20 +228,31 @@ function loadSachet(id) {
 
       parameters['face-color'] = sachet.frontBackgroundColor
       $('[name="face-color"]').val(sachet.frontBackgroundColor)
+      if (sachet.frontBackgroundColor && sachet.frontBackgroundColor !== $('[name="face-color"]').data('default-value')) addCloseButtonToInput($('[name="face-color"]')[0])
+
       parameters['face-opacity'] = sachet.frontBackgroundOpacity
       $('[name="face-opacity"]').val(sachet.frontBackgroundOpacity)
       parameters['face-font-color'] = sachet.frontColor
       $('[name="face-font-color"]').val(sachet.frontColor)
+      if (sachet.frontColor && sachet.frontColor !== $('[name="face-font-color"]').data('default-value')) addCloseButtonToInput($('[name="face-font-color"]')[0])
+
 
       parameters['back-color'] = sachet.backBackgroundColor
       $('[name="back-color"]').val(sachet.backBackgroundColor)
+      if (sachet.backBackgroundColor && sachet.backBackgroundColor !== $('[name="back-color"]').data('default-value')) addCloseButtonToInput($('[name="back-color"]')[0])
+
       parameters['back-opacity'] = sachet.backBackgroundOpacity
       $('[name="back-opacity"]').val(sachet.backBackgroundOpacity)
       parameters['back-font-color'] = sachet.backColor
       $('[name="back-font-color"]').val(sachet.backColor)
+      if (sachet.backColor && sachet.backColor !== $('[name="back-font-color"]').data('default-value')) addCloseButtonToInput($('[name="back-font-color"]')[0])
+
 
       parameters['email'] = sachet.email
       $('[name="email"]').val(sachet.email)
+
+      $('form [type="submit"]').text('Mettre à jour')
+      $('.btn-new-sachet').css("display", "block")
 
       updateCanvasFront()
       updateCanvas()
@@ -296,11 +321,38 @@ $(document).on('change', 'input', (e) => {
       updateCanvas()
     })
 
+    addCloseButtonToInput(e.target)
+
   } else {
     parameters[e.target.name] = e.target.value
+
+    if (e.target.value !== e.target.getAttribute('data-default-value') && e.target.type === 'color')
+      addCloseButtonToInput(e.target)
+
     updateCanvasFront()
     updateCanvas()
   }
+})
+
+function addCloseButtonToInput(input) {
+  $(input).after('<button class="btn btn-warning remove-button" type="button">x</button>')
+}
+
+$(document).on('click', '.remove-button', (e) => {
+  const $input = $(e.target).siblings('input')
+
+  if ($input.attr('type') === 'file') {
+    $(e.target).next('label').html('')
+
+    parameters[$input.attr('name')] = null
+    $input.val('')
+  } else {
+    parameters[$input.attr('name')] = $input.data('default-value')
+    $input.val($input.data('default-value'))
+  }
+
+  $(e.target).siblings('input').trigger('change')
+  $(e.target).remove()
 })
 
 const updateCanvas = async () => {
@@ -509,8 +561,8 @@ function updateFormResult(animate = false) {
 }
 
 function showSachetId(sachetId) {
-  $('.sachet-id span').text(sachetId);
-  $('.sachet-id').addClass('show');
+  $('.sachet-id span').text(sachetId)
+  $('.sachet-id').addClass('show')
 }
 
 if (sachetId) {
@@ -569,4 +621,4 @@ $('form').submit(function(e) {
 $('.btn-back').click(function() {
   const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?uxv&id=' + sachetId
   window.location.href = newUrl
-});
+})
