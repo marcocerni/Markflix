@@ -388,11 +388,11 @@ const updateCanvas = async () => {
   if (backgroundImage) {
     await loadImage(backgroundImage).then((image) => {
       context.globalAlpha = parameters['back-opacity'] / 100
-      context.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+      context.drawImage(image, DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
       context.globalAlpha = 1
 
       cctx.globalAlpha = parameters['back-opacity'] / 100
-      cctx.drawImage(image, CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+      cctx.drawImage(image, CANVAS_WIDTH + DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
       cctx.globalAlpha = 1
     })
   }
