@@ -1,10 +1,13 @@
-const path = require('path');
+const path = require('path')
 
 module.exports = {
-  entry: './src/index.js',
+  entry: {
+    app: './src/index.js',
+    admin: './src/admin.js'
+  },
   output: {
     path: path.resolve(__dirname, 'public'),
-    filename: 'bundle.js',
+    filename: '[name].js',
     publicPath: '/src/public',
   },
   devServer: {
@@ -12,4 +15,4 @@ module.exports = {
     compress: true,
     port: 8080,
   },
-};
+}

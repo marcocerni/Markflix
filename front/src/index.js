@@ -23,6 +23,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 //https://stackoverflow.com/questions/19351419/exporting-threejs-scene-to-obj-format
 
 const imagePublicPath = 'public/images'
+const sachetUrl = `${backUrl}/sachet`
 
 const mtlLoader = new MTLLoader()
 const objLoader = new OBJLoader()
@@ -210,7 +211,12 @@ function loadSachet(id) {
     url: `${sachetUrl}/${id}`,
     type: 'GET',
     success: function(sachet) {
-      parameters['logo-file'] = sachet.logo ? `${imagePublicPath}/${sachet.logo}` : null
+      if (sachet.logo && isDataURL(sachet.logo)) {
+        parameters['logo-file'] = sachet.logo
+      } else {
+        parameters['logo-file'] = sachet.logo ? `${imagePublicPath}/${sachet.logo}` : null
+      }
+
       $('[name="logo-file"]').next('label').html(sachet.logo)
       if (sachet.logo) addCloseButtonToInput($('[name="logo-file"]')[0])
       // $('[name="logo-file"]').prop('required', sachet.logo == null)
@@ -252,7 +258,7 @@ function loadSachet(id) {
       $('[name="email"]').val(sachet.email)
 
       $('form [type="submit"]').text('Mettre à jour')
-      $('.btn-new-sachet').css("display", "block")
+      $('.btn-new-sachet').css('display', 'block')
 
       updateCanvasFront()
       updateCanvas()
@@ -263,7 +269,20 @@ function loadSachet(id) {
   })
 }
 
+function isDataURL(s) {
+  return !!s.match(isDataURL.regex)
+}
+
+isDataURL.regex = /^\s*data:([a-z]+\/[a-z]+(;[a-z\-]+\=[a-z\-]+)?)?(;base64)?,[a-z0-9\!\$\&\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i
+
+
 function loadImage(imagePath) {
+  if (isDataURL(imagePath)) {
+    let image = new Image()
+    image.src = imagePath
+    return Promise.resolve(image)
+  }
+
   return new Promise((resolve, reject) => {
     let image = new Image()
     image.onload = () => {
@@ -474,11 +493,11 @@ const updateCanvasFront = async () => {
   if (backgroundImage) {
     await loadImage(backgroundImage).then((image) => {
       contextFront.globalAlpha = parameters['face-opacity'] / 100
-      contextFront.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+      contextFront.drawImage(image, DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
       contextFront.globalAlpha = 1
 
       cctx.globalAlpha = parameters['face-opacity'] / 100
-      cctx.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+      cctx.drawImage(image, DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
       cctx.globalAlpha = 1
     })
   }

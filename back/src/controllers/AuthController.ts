@@ -18,15 +18,17 @@ class AuthController {
         const userRepository = getRepository(User);
         let user: User;
         try {
-            user = await userRepository.findOneOrFail({where: {username}});
+            user = await userRepository.findOneOrFail( {username});
         } catch (error) {
-            res.status(401).send();
+            return res.status(401).send();
         }
+
+        console.log(req.body);
+        console.log(user);
 
         //Check if encrypted password match
         if (!user.checkIfUnencryptedPasswordIsValid(password)) {
-            res.status(401).send();
-            return;
+            return res.status(401).send();
         }
 
         //Sing JWT, valid for 1 hour

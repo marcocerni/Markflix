@@ -12,8 +12,7 @@ export class Sachet {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
-    @Length(4, 100)
+    @Column({type: 'text'})
     logo: string;
 
     @Column()

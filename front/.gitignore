@@ -1,8 +1,11 @@
 node_modules
 example
 .idea
+.vcode
 public/images
 public/config.js
+public/app.js
+public/admin.js
 public/bundle.js
 config.js
 v8-compile-cache-0

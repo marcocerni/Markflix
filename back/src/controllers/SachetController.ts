@@ -21,7 +21,7 @@ class SachetController {
         'frontBackgroundColor',
         'frontBackgroundOpacity',
         'frontColor',
-        'email'
+        'email',
       ],
     })
 
@@ -45,7 +45,7 @@ class SachetController {
           'frontBackgroundColor',
           'frontBackgroundOpacity',
           'frontColor',
-          'email'
+          'email',
         ],
       })
       res.send(sachet)
@@ -71,8 +71,8 @@ class SachetController {
       return res.status(409).send('id already in use')
     }
 
-    const result = await EmailService.sendNewSachetCreatedEmail(sachet);
-    const result2 = await EmailService.sendNewSachetCreatedEmailClient(sachet);
+    const result = await EmailService.sendNewSachetCreatedEmail(sachet)
+    const result2 = await EmailService.sendNewSachetCreatedEmailClient(sachet)
 
     res.status(200).send(sachet)
   }
@@ -90,26 +90,26 @@ class SachetController {
     return Promise.all((req.files as any).map(async (file) => {
       if (file.fieldname === 'logo-file') {
         if (sachet.logo) {
-          ImageService.deleteImage(sachet.logo);
+          ImageService.deleteImage(sachet.logo)
         }
 
-        sachet.logo = await ImageService.uploadImage(file);
+        sachet.logo = await ImageService.uploadImage(file)
       } else if (file.fieldname === 'face-file') {
         if (sachet.frontBackground) {
-          ImageService.deleteImage(sachet.frontBackground);
+          ImageService.deleteImage(sachet.frontBackground)
         }
 
-        sachet.frontBackground = await ImageService.uploadImage(file);
+        sachet.frontBackground = await ImageService.uploadImage(file)
       } else if (file.fieldname === 'back-file') {
         if (sachet.backBackground) {
-          ImageService.deleteImage(sachet.backBackground);
+          ImageService.deleteImage(sachet.backBackground)
         }
 
-        sachet.backBackground = await ImageService.uploadImage(file);
+        sachet.backBackground = await ImageService.uploadImage(file)
       } else {
-        return;
+        return
       }
-    }));
+    }))
   }
 
   static editSachet = async (req: Request, res: Response) => {
@@ -151,6 +151,45 @@ class SachetController {
     } catch (error) {
       return res.status(404).send('Sachet not found')
     }
+  }
+
+  static massiveSend = async (req: Request, res: Response) => {
+    const { content, csv } = req.body
+
+    const lineErrors = []
+
+    await Promise.all(csv.map(async (line, index) => {
+      const sachet = new Sachet()
+
+      sachet.logo = line[2]
+      sachet.email = line[0]
+      sachet.opacity = 50
+      sachet.backBackgroundColor = '#ffffff'
+      sachet.backBackgroundOpacity = 100
+      sachet.backColor = '#000000'
+      sachet.frontBackgroundColor = '#ffffff'
+      sachet.frontBackgroundOpacity = 100
+      sachet.frontColor = '#000000'
+
+      const errors = await validate(sachet)
+      if (errors.length > 0) {
+        lineErrors.push({
+          i: index,
+          errors: errors,
+        })
+      }
+
+      const sachetRepository = getRepository(Sachet)
+      try {
+        await sachetRepository.save(sachet)
+      } catch (e) {
+        return res.status(409).send(e.message)
+      }
+
+      const result = await EmailService.sendNewSachetCreatedEmailClient(sachet, content)
+    }))
+
+    res.status(200).send(lineErrors)
   }
 }
 

@@ -32,4 +32,12 @@ router.delete(
   SachetController.deleteSachet,
 )
 
+//Delete one user
+router.post(
+  '/massive',
+  [checkJwt, checkRole(['ADMIN'])],
+  SachetController.massiveSend,
+)
+
+
 export default router
