@@ -1,5 +1,3 @@
-import { Sachet } from '../entity/Sachet'
-
 import * as path from 'path'
 import * as sharp from 'sharp'
 import { v4 as uuidv4 } from 'uuid'
@@ -36,9 +34,14 @@ export class ImageService {
     fs.unlinkSync(`${IMAGE_FOLDER_PATH}/${filename}`)
   }
 
-  static createSachetImage(sachet: Sachet) {
+  static async createSachetImage(logo: string) {
+    let parts = logo.split(';');
+    let mimType = parts[0].split(':')[1];
+    let imageData = parts[1].split(',')[1];
+
+    const logoImage = await sharp(Buffer.from(imageData, 'base64')).resize({width: 250}).toBuffer();
     return sharp(__dirname +'/../static/Sachet.png')
-      .composite([{ input: sachet.logo, top: 100, left: 20}]).toBuffer()
+      .composite([{ input: await sharp(logoImage).toBuffer(), top: 160, left: 75}]).webp().toBuffer()
   }
 }
 

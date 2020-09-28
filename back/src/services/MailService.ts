@@ -1,10 +1,11 @@
 import config from '../config/config'
 import { Sachet } from '../entity/Sachet'
+import { ImageService } from './ImageService'
 
 const nodemailer = require('nodemailer')
 
 export class EmailService {
-  static sendMail(toEmail: string, subject: string, body: string, logoUri?: string): Promise<object> {
+  static sendMail(toEmail: string, subject: string, body: string, logo?: Buffer): Promise<object> {
     const transporter = nodemailer.createTransport({
       service: config.email.service,
       auth: {
@@ -15,13 +16,9 @@ export class EmailService {
 
     let attachments = [];
 
-    if (logoUri) {
+    if (logo) {
       attachments =  [{
-        filename: 'Sachet.png',
-        path: __dirname +'/../static/Sachet.png',
-        cid: 'sachet'
-      },{
-        path: logoUri,
+        content: logo,
         cid: 'logo'
       }];
     }
@@ -51,7 +48,7 @@ export class EmailService {
     return EmailService.sendMail(config.emailTo, subject, body);
   }
 
-  static sendNewSachetCreatedEmailClient(sachet: Sachet, contentEmail?: string) {
+  static async sendNewSachetCreatedEmailClient(sachet: Sachet, contentEmail?: string) {
     const subject = 'GEL + FRANCE - Nouveau sachet créé'
 
     const linkUrl = `${config.host}/?id=${sachet.id}`;
@@ -67,20 +64,23 @@ export class EmailService {
         <p>Bien Cordialement<br><a href="https://www.gelplusfrance.com/">https://www.gelplusfrance.com/</a></p>
         </div>`;
 
-    if (contentEmail) {
+    let logo;
 
+    if (contentEmail) {
       const styleTag = `<style>.sachet-container { position:relative } 
       .sachet-container .img-sachet {width: 200px;} 
       .sachet-container .img-logo {position: absolute;left: 31px;top: 72px;width: 138px;}</style>`
 
-      const imageTag = `${styleTag}<div class="sachet-container" style="position:relative"><img src="cid:sachet" class="img-sachet" style="width: 200px;" /><img src="cid:logo" class="img-logo" style="position: absolute;left: 31px;top: 72px;width: 138px;" /></div>`
+      const imageTag = `${styleTag}<div class="sachet-container" style="position:relative"><img src="cid:logo" class="img-logo" style="position: absolute;left: 31px;top: 72px;width: 138px;" /></div>`
 
       body = contentEmail
         .replace(/{ID_SACHET}/g, sachet.id.toString())
         .replace(/{SACHET_LINK}/g, linkHtml)
         .replace(/{SACHET_IMAGE}/g, imageTag)
+
+      logo = await ImageService.createSachetImage(sachet.logo)
     }
 
-    return EmailService.sendMail(sachet.email, subject, body, sachet.logo);
+    return EmailService.sendMail(sachet.email, subject, body, logo);
   }
 }
