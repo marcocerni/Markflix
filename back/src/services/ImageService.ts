@@ -37,7 +37,7 @@ export class ImageService {
   }
 
   static createSachetImage(sachet: Sachet) {
-    return sharp(__dirname + '/Sachet.png')
+    return sharp(__dirname +'/../static/Sachet.png')
       .composite([{ input: sachet.logo, top: 100, left: 20}]).toBuffer()
   }
 }

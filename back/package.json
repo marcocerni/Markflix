@@ -38,6 +38,7 @@
     "start": "set debug=* && ts-node-dev --respawn --transpileOnly ./src/index.ts",
     "prod": "tsc && node ./build/index.js",
     "migration:run": "ts-node ./node_modules/typeorm/cli.js migration:run",
-    "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync"
+    "schema:sync": "ts-node ./node_modules/typeorm/cli.js schema:sync",
+    "copy:assets": "npx cpx 'src/static/**' 'build/static'"
   }
 }

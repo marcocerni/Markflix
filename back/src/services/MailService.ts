@@ -18,7 +18,7 @@ export class EmailService {
     if (logoUri) {
       attachments =  [{
         filename: 'Sachet.png',
-        path: __dirname +'/Sachet.png',
+        path: __dirname +'/../static/Sachet.png',
         cid: 'sachet'
       },{
         path: logoUri,
