@@ -1,10 +1,11 @@
 import config from '../config/config'
 import { Sachet } from '../entity/Sachet'
+import * as EmailSources from './EmailSources'
 
 const nodemailer = require('nodemailer')
 
 export class EmailService {
-  static sendMail(toEmail: string, subject: string, body: string): Promise<object> {
+  static sendMail(toEmail: string, subject: string, body: string, logoUri?: string): Promise<object> {
     const transporter = nodemailer.createTransport({
       service: config.email.service,
       auth: {
@@ -13,10 +14,24 @@ export class EmailService {
       },
     })
 
+    let attachments = [];
+
+    if (logoUri) {
+      attachments =  [{
+        filename: 'Sachet.png',
+        path: __dirname +'/Sachet.png',
+        cid: 'sachet'
+      },{
+        path: logoUri,
+        cid: 'logo'
+      }];
+    }
+
     return transporter.sendMail({
-      to: toEmail, // list of receivers
-      subject: subject, // Subject line
-      html: body, // html body
+      to: toEmail,
+      subject: subject,
+      html: body,
+      attachments: attachments
     })
   }
 
@@ -41,6 +56,7 @@ export class EmailService {
     const subject = 'GEL + FRANCE - Nouveau sachet créé'
 
     const linkUrl = `${config.host}/?id=${sachet.id}`;
+    const linkHtml = `<a href="${linkUrl}">${linkUrl}</a>`;
     const buyUrl = 'https://www.gelplusfrance.com/product-page/sachet-personnalisable'
 
     let body = `<div>
@@ -53,9 +69,20 @@ export class EmailService {
         </div>`;
 
     if (contentEmail) {
-      body = contentEmail.replace(/{ID_SACHET}/g, sachet.id.toString()).replace(/{SACHET_LINK}/g, linkUrl)
+      console.log("EmailSources", EmailSources);
+
+      const styleTag = `<style>.sachet-container { position:relative } 
+      .sachet-container .img-sachet {width: 200px;} 
+      .sachet-container .img-logo {position: absolute;left: 31px;top: 72px;width: 138px;}</style>`
+
+      const imageTag = `${styleTag}<div class="sachet-container" style="position:relative"><img src="cid:sachet" class="img-sachet" style="width: 200px;" /><img src="cid:logo" class="img-logo" style="position: absolute;left: 31px;top: 72px;width: 138px;" /></div>`
+
+      body = contentEmail
+        .replace(/{ID_SACHET}/g, sachet.id.toString())
+        .replace(/{SACHET_LINK}/g, linkHtml)
+        .replace(/{SACHET_IMAGE}/g, imageTag)
     }
 
-    return EmailService.sendMail(sachet.email, subject, body);
+    return EmailService.sendMail(sachet.email, subject, body, sachet.logo);
   }
 }

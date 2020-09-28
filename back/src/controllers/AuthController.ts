@@ -23,9 +23,6 @@ class AuthController {
             return res.status(401).send();
         }
 
-        console.log(req.body);
-        console.log(user);
-
         //Check if encrypted password match
         if (!user.checkIfUnencryptedPasswordIsValid(password)) {
             return res.status(401).send();

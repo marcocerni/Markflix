@@ -1,6 +1,9 @@
-const path = require('path')
-const sharp = require('sharp')
-import { v4 as uuidv4 } from 'uuid';
+import { Sachet } from '../entity/Sachet'
+
+import * as path from 'path'
+import * as sharp from 'sharp'
+import { v4 as uuidv4 } from 'uuid'
+
 const fs = require('fs')
 
 const IMAGE_FOLDER_PATH = path.join(__dirname, '../../../front/public/images')
@@ -31,6 +34,11 @@ export class ImageService {
 
   static deleteImage(filename: string) {
     fs.unlinkSync(`${IMAGE_FOLDER_PATH}/${filename}`)
+  }
+
+  static createSachetImage(sachet: Sachet) {
+    return sharp(__dirname + '/Sachet.png')
+      .composite([{ input: sachet.logo, top: 100, left: 20}]).toBuffer()
   }
 }
 

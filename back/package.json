@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "BackEnd project starter: Express, TypeScript, TypeORM, passport and others.",
   "devDependencies": {
-    "ts-node": "8.10.2",
-    "@types/node": "^14.0.13",
     "@types/bcryptjs": "^2.4.2",
     "@types/body-parser": "^1.19.0",
     "@types/cors": "^2.8.6",
     "@types/helmet": "0.0.47",
     "@types/jsonwebtoken": "^8.5.0",
+    "@types/node": "^14.0.13",
+    "@types/sharp": "^0.26.0",
+    "ts-node": "8.10.2",
     "typescript": "3.9.5"
   },
   "dependencies": {

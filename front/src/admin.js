@@ -14,7 +14,8 @@ $(document).ready(() => {
 
       const body = `<div>
         <p>Bonjour,</p>
-        <p>Veuillez trouver ci-joint le visuel 3D du sachet crée référence <b>{ID_SACHET}</b> : <a href="{SACHET_LINK}">{SACHET_LINK}</a>
+        <p>{SACHET_IMAGE}</p>
+        <p>Veuillez trouver ci-joint le visuel 3D du sachet crée référence <b>{ID_SACHET}</b> : {SACHET_LINK}
         <br/>Pour commander, cliquer sur ce lien : <a href="${buyUrl}">${buyUrl}</a>
         </p>
         <p></p>
@@ -109,10 +110,11 @@ $(document).on('change', '#csv-file', (e) => {
       const html = csv.reduce((html, line, index) => {
 
         html += `<tr>
+            <td><div class="form-group form-check"><input type="checkbox" class="form-check-input check-row" data-index="${index}" checked></div></td>
             <td>${index + 1}</td>
             <td>${line[0]}</td>
             <td>${line[1]}</td>
-            <td><img src="${line[2]}" class="logo-image" /></td>
+            <td><img src="${line[2]}" class="logo-image"/></td>
         </tr>`
 
         return html
@@ -138,7 +140,13 @@ $(document).on('change', '#csv-file', (e) => {
 $(document).on('click', '#send-emails', (e) => {
   e.preventDefault()
 
-  if (!csv || !csv.length) return
+  const selectedRows = $('.check-row').toArray()
+    .filter((element) => $(element).prop('checked'))
+    .map((element) => parseInt($(element).data('index')))
+
+  const csvFiltered = csv.filter((e, i) => selectedRows.includes(i))
+
+  if (!csvFiltered || !csvFiltered.length) return
 
   const $button = $(this)
 
@@ -150,11 +158,11 @@ $(document).on('click', '#send-emails', (e) => {
     url: postUrl,
     type: 'POST',
     headers: {
-      "Authorization": `Bearer ${window.localStorage.getItem('session')}`
+      'Authorization': `Bearer ${window.localStorage.getItem('session')}`,
     },
     data: {
       content: editor.getData(),
-      csv: csv,
+      csv: csvFiltered,
     },
     success: function(response) {
       Toastify({
@@ -180,4 +188,21 @@ $(document).on('click', '#send-emails', (e) => {
   })
 
   return false
+})
+
+$(document).on('change', '.check-all', function(event) {
+  const $checkbox = $(event.target)
+  const checked = $checkbox.prop('checked')
+
+  $('.check-row').prop('checked', checked)
+  // const selectedIndex = $checkbox.data('index')  ? parseInt($checkbox.data('index')) : null;
+
+  $('.check-row').toArray().filter(function(element) {
+    return $(element).prop('checked')
+  }).map(function(element) {
+    return parseInt($(element).data('index'))
+  })
+
+  // console.log(selectedIndex);
+  // console.log(checked);
 })

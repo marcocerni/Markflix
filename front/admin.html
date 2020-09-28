@@ -86,6 +86,13 @@
         .logo-image {
             max-height: 120px;
         }
+
+        .custom-file-input.custom-file-label::after,
+        .custom-file-input:lang(en)~.custom-file-label::after,
+        .custom-file-input:lang(fr)~.custom-file-label::after {
+            content: '.csv, .txt'
+        }
+
     </style>
     <title>GEL + FRANCE - Mailer</title>
 </head>
@@ -132,6 +139,7 @@
                     <table class="table table-bordered">
                         <thead>
                         <tr>
+                            <th scope="col"><div class="form-group form-check"><input type="checkbox" class="form-check-input check-all" checked></div></th>
                             <th scope="col">#</th>
                             <th scope="col">Email</th>
                             <th scope="col">Url</th>
@@ -140,7 +148,7 @@
                         </thead>
                         <tbody class="csv-content">
                         <tr>
-                            <td colspan="4"><p class="text-center">No content loaded yet 😟</p></td>
+                            <td colspan="5"><p class="text-center">No content loaded yet 😟</p></td>
                         </tr>
                         </tbody>
                     </table>
