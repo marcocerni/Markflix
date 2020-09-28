@@ -43,9 +43,9 @@ export class ImageService {
 }
 
 class ImageResizeProvider {
-  private folder: object
+  private folder: string
 
-  constructor(folder: object) {
+  constructor(folder: string) {
     this.folder = folder
   }
 

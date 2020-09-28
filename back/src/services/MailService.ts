@@ -1,6 +1,5 @@
 import config from '../config/config'
 import { Sachet } from '../entity/Sachet'
-import * as EmailSources from './EmailSources'
 
 const nodemailer = require('nodemailer')
 
@@ -69,7 +68,6 @@ export class EmailService {
         </div>`;
 
     if (contentEmail) {
-      console.log("EmailSources", EmailSources);
 
       const styleTag = `<style>.sachet-container { position:relative } 
       .sachet-container .img-sachet {width: 200px;} 
