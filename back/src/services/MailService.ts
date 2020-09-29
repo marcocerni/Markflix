@@ -19,7 +19,8 @@ export class EmailService {
     if (logo) {
       attachments =  [{
         content: logo,
-        cid: 'logo'
+        cid: 'logo',
+        filename: 'logo.jpg'
       }];
     }
 

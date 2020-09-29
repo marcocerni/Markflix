@@ -56,4 +56,5 @@ export class Sachet {
     @UpdateDateColumn()
     updatedAt: Date;
 
+    link: string
 }

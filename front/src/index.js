@@ -256,6 +256,7 @@ function loadSachet(id) {
 
       parameters['email'] = sachet.email
       $('[name="email"]').val(sachet.email)
+      $('[name="email"]').hide()
 
       $('form [type="submit"]').text('Mettre à jour')
       $('.btn-new-sachet').css('display', 'block')

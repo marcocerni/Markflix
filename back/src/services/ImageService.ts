@@ -41,7 +41,7 @@ export class ImageService {
 
     const logoImage = await sharp(Buffer.from(imageData, 'base64')).resize({width: 250}).toBuffer();
     return sharp(__dirname +'/../static/Sachet.png')
-      .composite([{ input: await sharp(logoImage).toBuffer(), top: 160, left: 75}]).webp().toBuffer()
+      .composite([{ input: await sharp(logoImage).toBuffer(), top: 160, left: 75}]).jpeg({quality: 50}).toBuffer()
   }
 }
 

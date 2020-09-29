@@ -94,7 +94,7 @@ function loadFile(file) {
   })
 }
 
-let fileName;
+let fileName
 
 $(document).on('change', '#csv-file', (e) => {
   if (e.target.files && e.target.files.length) {
@@ -122,12 +122,15 @@ $(document).on('change', '#csv-file', (e) => {
             <td>${line[0]}</td>
             <td>${line[1]}</td>
             <td><img src="${line[2]}" class="logo-image"/></td>
+            <td></td>
+            <td></td>
         </tr>`
 
         return html
       }, '')
 
       $('#send-emails').prop('disabled', csv.length === 0)
+      $('#save-sachets').prop('disabled', csv.length === 0)
       $('#download-rows').prop('disabled', csv.length === 0)
 
       $('.csv-content').html(html)
@@ -139,6 +142,7 @@ $(document).on('change', '#csv-file', (e) => {
       }).showToast()
 
       $('#send-emails').prop('disabled', false)
+      $('#save-sachets').prop('disabled', false)
       $('#download-rows').prop('disabled', false)
     })
   }
@@ -157,8 +161,10 @@ document.getElementById('download-rows').addEventListener('click', function() {
   this.download = fileName ? fileName : 'output.csv'
 }, false)
 
-$(document).on('click', '#send-emails', (e) => {
+$(document).on('click', '#send-emails, #save-sachets', (e) => {
   e.preventDefault()
+
+  const sendEmails = $(e.target).attr('id') === 'send-emails'
 
   const selectedRows = $('.check-row').toArray()
     .filter((element) => $(element).prop('checked'))
@@ -168,7 +174,7 @@ $(document).on('click', '#send-emails', (e) => {
 
   if (!csvFiltered || !csvFiltered.length) return
 
-  const $button = $(this)
+  const $button = $(e.target)
 
   const oldContent = $button.html()
   $button.html(oldContent + ' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
@@ -183,6 +189,7 @@ $(document).on('click', '#send-emails', (e) => {
     data: {
       content: editor.getData(),
       csv: csvFiltered,
+      sendEmails: sendEmails,
     },
     success: function(response) {
       Toastify({
@@ -190,6 +197,16 @@ $(document).on('click', '#send-emails', (e) => {
         duration: 3000,
         backgroundColor: 'linear-gradient(to right, rgb(0, 176, 155), rgb(150, 201, 61))',
       }).showToast()
+
+      response.sachets.forEach((sachet, index) => {
+        const rowNumber = selectedRows[index]
+        const tds = $($('.csv-content tr').get(rowNumber)).find('td')
+
+        tds[tds.length-2].innerHTML = sachet.id
+        tds[tds.length-1].innerHTML = sachet.link
+
+        csv[rowNumber].push(sachet.id, sachet.link)
+      })
 
       $button.html(oldContent)
       $button.prop('disabled', false)

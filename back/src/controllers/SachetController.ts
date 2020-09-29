@@ -4,6 +4,7 @@ import { validate } from 'class-validator'
 import { Sachet } from '../entity/Sachet'
 import { ImageService } from '../services/ImageService'
 import { EmailService } from '../services/MailService'
+import config from '../config/config'
 
 class SachetController {
 
@@ -154,11 +155,11 @@ class SachetController {
   }
 
   static massiveSend = async (req: Request, res: Response) => {
-    const { content, csv } = req.body
+    const { content, csv, sendEmails = false } = req.body
 
     const lineErrors = []
 
-    await Promise.all(csv.map(async (line, index) => {
+    const sachets = await Promise.all(csv.map(async (line, index) => {
       const sachet = new Sachet()
 
       sachet.logo = line[2]
@@ -182,14 +183,19 @@ class SachetController {
       const sachetRepository = getRepository(Sachet)
       try {
         await sachetRepository.save(sachet)
+
+        sachet.link = `${config.host}/?id=${sachet.id}`
       } catch (e) {
         return res.status(409).send(e.message)
       }
 
-      const result = await EmailService.sendNewSachetCreatedEmailClient(sachet, content)
+      if (sendEmails)
+        await EmailService.sendNewSachetCreatedEmailClient(sachet, content)
+
+      return sachet;
     }))
 
-    res.status(200).send(lineErrors)
+    res.status(200).send({errors: lineErrors, sachets: sachets})
   }
 }
 
