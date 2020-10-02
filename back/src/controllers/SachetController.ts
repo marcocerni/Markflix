@@ -196,11 +196,14 @@ class SachetController {
 
     if (sendEmails === 'true') {
       console.log('entro email')
+      console.time('entro email')
       const emailService = new EmailService();
 
       await Promise.all(sachets.map((sachet : Sachet) => {
         return emailService.sendNewSachetCreatedEmailClient(sachet, content)
       }));
+
+      console.timeEnd('entro email')
     }
 
     res.status(200).send({errors: lineErrors, sachets: sachets})
