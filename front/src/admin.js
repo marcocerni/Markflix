@@ -193,7 +193,7 @@ $(document).on('click', '#send-emails, #save-sachets', (e) => {
     },
     success: function(response) {
       Toastify({
-        text: 'Emails sent',
+        text: sendEmails ? 'Emails sent' : 'Sachets created',
         duration: 3000,
         backgroundColor: 'linear-gradient(to right, rgb(0, 176, 155), rgb(150, 201, 61))',
       }).showToast()
