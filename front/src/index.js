@@ -588,7 +588,7 @@ const updateCanvasFront = async () => {
   }
 
   await Promise.all(imageSourcesSachet.map((image, index) => {
-    const textImageIndex = imageSources.length - (logoImage ? 2 : 1)
+    const textImageIndex = imageSourcesSachet.length - (logoImage ? 2 : 1)
 
     if (index !== textImageIndex) {
       return loadImage(image)
