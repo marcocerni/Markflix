@@ -1,18 +1,22 @@
 import config from '../config/config'
 import { Sachet } from '../entity/Sachet'
 import { ImageService } from './ImageService'
-
-const nodemailer = require('nodemailer')
+import * as nodemailer from 'nodemailer'
 
 export class EmailService {
-  static sendMail(toEmail: string, subject: string, body: string, logo?: Buffer): Promise<object> {
-    const transporter = nodemailer.createTransport({
+  private transporter: any
+
+  constructor() {
+    this.transporter = nodemailer.createTransport({
       service: config.email.service,
       auth: {
         user: config.email.user,
         pass: config.email.password,
       },
     })
+  }
+
+  sendMail(toEmail: string, subject: string, body: string, logo?: Buffer): Promise<object> {
 
     let attachments = [];
 
@@ -24,7 +28,7 @@ export class EmailService {
       }];
     }
 
-    return transporter.sendMail({
+    return this.transporter.sendMail({
       to: toEmail,
       subject: subject,
       html: body,
@@ -32,7 +36,7 @@ export class EmailService {
     })
   }
 
-  static sendNewSachetCreatedEmail(sachet: Sachet) {
+  sendNewSachetCreatedEmail(sachet: Sachet) {
     const subject = 'GEL + FRANCE - Nouveau sachet créé'
 
     const linkUrl = `${config.host}/?uxv&id=${sachet.id}`;
@@ -46,10 +50,10 @@ export class EmailService {
         <p>Cordialement</p>
         </div>`;
 
-    return EmailService.sendMail(config.emailTo, subject, body);
+    return this.sendMail(config.emailTo, subject, body);
   }
 
-  static async sendNewSachetCreatedEmailClient(sachet: Sachet, contentEmail?: string) {
+  async sendNewSachetCreatedEmailClient(sachet: Sachet, contentEmail?: string) {
     const subject = 'GEL + FRANCE - Nouveau sachet créé'
 
     const linkUrl = `${config.host}/?id=${sachet.id}`;
@@ -82,6 +86,6 @@ export class EmailService {
       logo = await ImageService.createSachetImage(sachet.logo)
     }
 
-    return EmailService.sendMail(sachet.email, subject, body, logo);
+    return this.sendMail(sachet.email, subject, body, logo);
   }
 }

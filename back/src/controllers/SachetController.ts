@@ -72,8 +72,10 @@ class SachetController {
       return res.status(409).send('id already in use')
     }
 
-    const result = await EmailService.sendNewSachetCreatedEmail(sachet)
-    const result2 = await EmailService.sendNewSachetCreatedEmailClient(sachet)
+    const emailService = new EmailService();
+
+    const result = await emailService.sendNewSachetCreatedEmail(sachet)
+    const result2 = await emailService.sendNewSachetCreatedEmailClient(sachet)
 
     res.status(200).send(sachet)
   }
@@ -155,7 +157,7 @@ class SachetController {
   }
 
   static massiveSend = async (req: Request, res: Response) => {
-    const { content, csv, sendEmails = false } = req.body
+    const { content, csv, sendEmails } = req.body
 
     const lineErrors = []
 
@@ -189,11 +191,17 @@ class SachetController {
         return res.status(409).send(e.message)
       }
 
-      if (sendEmails)
-        await EmailService.sendNewSachetCreatedEmailClient(sachet, content)
-
       return sachet;
     }))
+
+    if (sendEmails === 'true') {
+      console.log('entro email')
+      const emailService = new EmailService();
+
+      await Promise.all(sachets.map((sachet : Sachet) => {
+        return emailService.sendNewSachetCreatedEmailClient(sachet, content)
+      }));
+    }
 
     res.status(200).send({errors: lineErrors, sachets: sachets})
   }
