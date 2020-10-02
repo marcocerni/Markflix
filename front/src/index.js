@@ -402,7 +402,7 @@ const updateCanvas = async () => {
 
   if (backgroundColor !== '#ffffff') {
     cctx.fillStyle = backgroundColor
-    cctx.fillRect(CANVAS_WIDTH + DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+    cctx.fillRect(CANVAS_WIDTH + DX_F, DY_F, BACKGROUND_WIDTH_F, BACKGROUND_HEIGHT_F)
   }
 
   const backgroundImage = parameters['back-file']
@@ -414,7 +414,7 @@ const updateCanvas = async () => {
       context.globalAlpha = 1
 
       cctx.globalAlpha = parameters['back-opacity'] / 100
-      cctx.drawImage(image, CANVAS_WIDTH + DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+      cctx.drawImage(image, CANVAS_WIDTH + DX_F, DY_F, BACKGROUND_WIDTH_F, BACKGROUND_HEIGHT_F)
       cctx.globalAlpha = 1
     })
   }
@@ -470,11 +470,14 @@ const updateCanvas = async () => {
 
 // const LOGO_CENTER_X = 2217 (665), LOGO_CENTER_Y = 3000, LOGO_MAX_WIDTH = 3000, LOGO_MAX_HEIGHT = 4000
 
-const LOGO_CENTER_X = 665, LOGO_CENTER_Y = 900, LOGO_MAX_WIDTH = 900, LOGO_MAX_HEIGHT = 1200
+const LOGO_CENTER_X = 665, LOGO_CENTER_Y = 900, LOGO_MAX_WIDTH = 950, LOGO_MAX_HEIGHT = 1200
 const CANVAS_WIDTH = 1330, CANVAS_HEIGHT = 2177
 const BORDER_WIDTH = 200, BORDER_HEIGHT = 200
 const DX = BORDER_WIDTH, DY = BORDER_HEIGHT, BACKGROUND_WIDTH = CANVAS_WIDTH - (2 * BORDER_WIDTH),
   BACKGROUND_HEIGHT = CANVAS_HEIGHT - (2 * BORDER_HEIGHT)
+const BORDER_WIDTH_F = 160, BORDER_HEIGHT_F = 175
+const DX_F = BORDER_WIDTH_F, DY_F = BORDER_HEIGHT_F, BACKGROUND_WIDTH_F = CANVAS_WIDTH - (2 * BORDER_WIDTH_F),
+  BACKGROUND_HEIGHT_F = CANVAS_HEIGHT - (2 * BORDER_HEIGHT_F)
 
 const cResult = document.createElement('canvas')
 const cctx = cResult.getContext('2d')
@@ -506,7 +509,7 @@ const updateCanvasFront = async () => {
 
   if (backgroundColor !== '#ffffff') {
     cctx.fillStyle = backgroundColor
-    cctx.fillRect(DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+    cctx.fillRect(DX_F, DY_F, BACKGROUND_WIDTH_F, BACKGROUND_HEIGHT_F)
   }
 
   const backgroundImage = parameters['face-file']
@@ -518,7 +521,7 @@ const updateCanvasFront = async () => {
       contextFront.globalAlpha = 1
 
       cctx.globalAlpha = parameters['face-opacity'] / 100
-      cctx.drawImage(image, DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
+      cctx.drawImage(image, DX_F, DY_F, BACKGROUND_WIDTH_F, BACKGROUND_HEIGHT_F)
       cctx.globalAlpha = 1
     })
   }
