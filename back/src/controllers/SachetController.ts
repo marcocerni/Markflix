@@ -5,6 +5,14 @@ import { Sachet } from '../entity/Sachet'
 import { ImageService } from '../services/ImageService'
 import { EmailService } from '../services/MailService'
 import config from '../config/config'
+import * as https from 'https'
+
+const Hashids = require('hashids/cjs')
+const validUrl = require('valid-url')
+
+const hashids = new Hashids(config.hashSalt, 10)
+
+// const hashids = new Hashids(config.hashSalt)
 
 class SachetController {
 
@@ -12,30 +20,41 @@ class SachetController {
     const sachetRepository = getRepository(Sachet)
     const sachets = await sachetRepository.find({
       select: [
-        'logo',
-        'opacity',
-        'backBackground',
-        'backBackgroundColor',
-        'backBackgroundOpacity',
-        'backColor',
-        'frontBackground',
-        'frontBackgroundColor',
-        'frontBackgroundOpacity',
-        'frontColor',
+        'id',
         'email',
+        // 'opacity',
+        // 'backBackground',
+        // 'backBackgroundColor',
+        // 'backBackgroundOpacity',
+        // 'backColor',
+        // 'frontBackground',
+        // 'frontBackgroundColor',
+        // 'frontBackgroundOpacity',
+        // 'frontColor',
+        // 'logo',
       ],
+    })
+
+    sachets.forEach(sachet => {
+      sachet.hashedId = hashids.encode(sachet.id)
+      sachet.link = `${config.host}/?id=${sachet.hashedId}`
     })
 
     res.send(sachets)
   }
 
   static getOneById = async (req: Request, res: Response) => {
-    const id: string = req.params.id
+    const id = hashids.decode(req.params.id)[0] as number
+
+    if (!id) {
+      return res.status(404).send('Sachet not found')
+    }
 
     const sachetRepository = getRepository(Sachet)
     try {
       const sachet = await sachetRepository.findOneOrFail(id, {
         select: [
+          'id',
           'logo',
           'opacity',
           'backBackground',
@@ -49,8 +68,37 @@ class SachetController {
           'email',
         ],
       })
+
+      sachet.hashedId = hashids.encode(sachet.id)
+      sachet.link = `${config.host}/?id=${sachet.hashedId}`
+
       res.send(sachet)
     } catch (error) {
+      res.status(404).send('Sachet not found')
+    }
+  }
+
+  static getLogo = async (req: Request, res: Response) => {
+    const id = hashids.decode(req.params.id)[0] as number
+
+    const sachetRepository = getRepository(Sachet)
+    try {
+      const sachet = await sachetRepository.findOneOrFail(id)
+
+      if (validUrl.isUri(sachet.logo)) {
+
+        https.get(sachet.logo, (resImage) => {
+          res.status(resImage.statusCode)
+          res.setHeader('Content-Type', resImage.headers['content-type']);
+          resImage.pipe(res)
+        }).on('error', (error) => {
+          console.error(error);
+        })
+      } else {
+        res.send(sachet.logo)
+      }
+    } catch (error) {
+      console.error(error);
       res.status(404).send('Sachet not found')
     }
   }
@@ -68,11 +116,14 @@ class SachetController {
     const sachetRepository = getRepository(Sachet)
     try {
       await sachetRepository.save(sachet)
+
+      sachet.hashedId = hashids.encode(sachet.id)
+      sachet.link = `${config.host}/?id=${sachet.hashedId}`
     } catch (e) {
       return res.status(409).send('id already in use')
     }
 
-    const emailService = new EmailService();
+    const emailService = new EmailService()
 
     const result = await emailService.sendNewSachetCreatedEmail(sachet)
     const result2 = await emailService.sendNewSachetCreatedEmailClient(sachet)
@@ -116,7 +167,7 @@ class SachetController {
   }
 
   static editSachet = async (req: Request, res: Response) => {
-    const id = req.params.id
+    const id = hashids.decode(req.params.id)[0] as number
 
     const sachetRepository = getRepository(Sachet)
     let sachet
@@ -135,6 +186,9 @@ class SachetController {
 
     try {
       await sachetRepository.save(sachet)
+
+      sachet.hashedId = hashids.encode(sachet.id)
+      sachet.link = `${config.host}/?id=${sachet.hashedId}`
     } catch (e) {
       return res.status(409).send('id already in use')
     }
@@ -143,7 +197,7 @@ class SachetController {
   }
 
   static deleteSachet = async (req: Request, res: Response) => {
-    const id = req.params.id
+    const id = hashids.decode(req.params.id)[0] as number
 
     const sachetRepository = getRepository(Sachet)
     try {
@@ -186,27 +240,28 @@ class SachetController {
       try {
         await sachetRepository.save(sachet)
 
-        sachet.link = `${config.host}/?id=${sachet.id}`
+        sachet.hashedId = hashids.encode(sachet.id)
+        sachet.link = `${config.host}/?id=${sachet.hashedId}`
       } catch (e) {
         return res.status(409).send(e.message)
       }
 
-      return sachet;
+      return sachet
     }))
 
     if (sendEmails === 'true') {
       console.log('entro email')
       console.time('entro email')
-      const emailService = new EmailService();
+      const emailService = new EmailService()
 
-      await Promise.all(sachets.map((sachet : Sachet) => {
+      await Promise.all(sachets.map((sachet: Sachet) => {
         return emailService.sendNewSachetCreatedEmailClient(sachet, content)
-      }));
+      }))
 
       console.timeEnd('entro email')
     }
 
-    res.status(200).send({errors: lineErrors, sachets: sachets})
+    res.status(200).send({ errors: lineErrors, sachets: sachets })
   }
 }
 

@@ -57,4 +57,5 @@ export class Sachet {
     updatedAt: Date;
 
     link: string
+    hashedId: string
 }

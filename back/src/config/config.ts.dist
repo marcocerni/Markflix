@@ -10,5 +10,6 @@ export default {
     user: 'gelplusfrance@gmail.com',
     password: 'XXXXXXXXXXX',
   },
-  emailTo: 'ivancerni@gmail.com'
+  emailTo: 'ivancerni@gmail.com',
+  hashSalt: 'XXXXXXXXX'
 };

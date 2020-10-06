@@ -71,7 +71,7 @@ function init() {
               // backSachet.clipIntersection = true;
               // backSachet.side = DoubleSide;
 
-              resolve();
+              resolve()
             }
           })
 
@@ -136,9 +136,9 @@ function init() {
       animate()
       renderer.render(scene, camera)
     } catch (e) {
-      reject(e);
+      reject(e)
     }
-  });
+  })
 }
 
 window.addEventListener('resize', function onWindowResize() {
@@ -206,7 +206,10 @@ function loadSachet(id) {
       url: `${sachetUrl}/${id}`,
       type: 'GET',
       success: function(sachet) {
-        if (sachet.logo && isDataURL(sachet.logo)) {
+        sachetId = sachet.id
+        sachetHash = sachet.hashedId
+
+        if (sachet.logo && (isDataURL(sachet.logo) || isURL(sachet.logo))) {
           parameters['logo-file'] = sachet.logo
         } else {
           parameters['logo-file'] = sachet.logo ? `${imagePublicPath}/${sachet.logo}` : null
@@ -256,34 +259,33 @@ function loadSachet(id) {
         $('form [type="submit"]').text('Mettre à jour')
         $('.btn-new-sachet').css('display', 'block')
 
-        showSachetId(id)
+        showSachetId(sachetId)
 
-        resolve();
+        resolve()
       },
       error: function(error) {
-        reject(error);
+        reject(error)
       },
     })
   })
 }
 
 function isDataURL(s) {
-  return !!s.match(isDataURL.regex)
+  return !!s.match(isDataURL.regexData)/* || !!s.match(isDataURL.regexUrl)*/
 }
 
-isDataURL.regex = /^\s*data:([a-z]+\/[a-z]+(;[a-z\-]+\=[a-z\-]+)?)?(;base64)?,[a-z0-9\!\$\&\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i
+function isURL(s) {
+  return !!s.match(isDataURL.regexUrl)
+}
+
+isDataURL.regexData = /^\s*data:([a-z]+\/[a-z]+(;[a-z\-]+\=[a-z\-]+)?)?(;base64)?,[a-z0-9\!\$\&\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i
+isDataURL.regexUrl = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
 
 
 function loadImage(imagePath) {
 
   if (typeof imagePath === 'object') {
     return Promise.resolve(imagePath)
-  }
-
-  if (isDataURL(imagePath)) {
-    let image = new Image()
-    image.src = imagePath
-    return Promise.resolve(image)
   }
 
   return new Promise((resolve, reject) => {
@@ -294,7 +296,11 @@ function loadImage(imagePath) {
     image.onerror = (err) => {
       reject(err)
     }
-    image.src = imagePath
+    if (isURL(imagePath)) {
+      image.src = `${sachetUrl}/${sachetHash}/logo`
+    } else {
+      image.src = imagePath
+    }
   })
 }
 
@@ -443,10 +449,10 @@ const updateCanvas = async () => {
         }
       })
     }).then(() => {
-    return loadTexture(canvas.toDataURL(), false)
-  }).catch((err) => {
-    console.error(err)
-  })
+      return loadTexture(canvas.toDataURL(), false)
+    }).catch((err) => {
+      console.error(err)
+    })
 
   const imageSourcesSachet = [$('#DessinDosSachet')[0], $('#TextDosSachet')[0]]
 
@@ -461,11 +467,11 @@ const updateCanvas = async () => {
   }))
     .then((images) => {
       images.forEach((image, index) => {
-          cctx.drawImage(image, CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
+        cctx.drawImage(image, CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
       })
     }).catch((err) => {
-    console.error(err)
-  })
+      console.error(err)
+    })
 }
 
 // const LOGO_CENTER_X = 2217 (665), LOGO_CENTER_Y = 3000, LOGO_MAX_WIDTH = 3000, LOGO_MAX_HEIGHT = 4000
@@ -473,9 +479,14 @@ const updateCanvas = async () => {
 const LOGO_CENTER_X = 665, LOGO_CENTER_Y = 900, LOGO_MAX_WIDTH = 950, LOGO_MAX_HEIGHT = 1200
 const CANVAS_WIDTH = 1330, CANVAS_HEIGHT = 2177
 const BORDER_WIDTH = 200, BORDER_HEIGHT = 200
+
+// const LOGO_CENTER_X = 1330, LOGO_CENTER_Y = 1800, LOGO_MAX_WIDTH = 1900, LOGO_MAX_HEIGHT = 2400
+// const CANVAS_WIDTH = 2660, CANVAS_HEIGHT = 4354
+// const BORDER_WIDTH = 400, BORDER_HEIGHT = 400
+
 const DX = BORDER_WIDTH, DY = BORDER_HEIGHT, BACKGROUND_WIDTH = CANVAS_WIDTH - (2 * BORDER_WIDTH),
   BACKGROUND_HEIGHT = CANVAS_HEIGHT - (2 * BORDER_HEIGHT)
-const BORDER_WIDTH_F = 160, BORDER_HEIGHT_F = 175
+const BORDER_WIDTH_F = 320, BORDER_HEIGHT_F = 350
 const DX_F = BORDER_WIDTH_F, DY_F = BORDER_HEIGHT_F, BACKGROUND_WIDTH_F = CANVAS_WIDTH - (2 * BORDER_WIDTH_F),
   BACKGROUND_HEIGHT_F = CANVAS_HEIGHT - (2 * BORDER_HEIGHT_F)
 
@@ -526,7 +537,6 @@ const updateCanvasFront = async () => {
     })
   }
 
-
   let logoImage = parameters['logo-file']
 
   if (!logoImage && !backgroundImage) {
@@ -553,6 +563,7 @@ const updateCanvasFront = async () => {
     .then((images) => {
       images.forEach((image, index) => {
 
+
         if (!index) {
           contextFront.globalAlpha = parameters['sides-opacity'] / 100
           contextFront.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
@@ -572,6 +583,8 @@ const updateCanvasFront = async () => {
           const dx = LOGO_CENTER_X - (width / 2)
           const dy = LOGO_CENTER_Y - (height / 2)
 
+          console.log(image)
+
           contextFront.drawImage(image, dx, dy, width, height)
         } else {
 
@@ -579,6 +592,7 @@ const updateCanvasFront = async () => {
         }
       })
     }).then(() => {
+      console.log('loadtext', canvasFront)
       return loadTexture(canvasFront.toDataURL(), true)
     }).catch((err) => {
       console.error(err)
@@ -629,7 +643,8 @@ const updateCanvasFront = async () => {
     })
 }
 
-let sachetId = getUrlParameter('id')
+let sachetHash = getUrlParameter('id')
+let sachetId = null
 let editable = getUrlParameter('uxv')
 
 function updateFormResult(animate = false) {
@@ -650,18 +665,25 @@ function showSachetId(sachetId) {
   $('.sachet-id').addClass('show')
 }
 
-$(window).on('load', async  () => {
+$(window).on('load', async () => {
   await init()
 
-  if (sachetId) {
-    updateFormResult()
-    await loadSachet(sachetId)
+
+  if (sachetHash) {
+    try {
+      await loadSachet(sachetHash)
+      updateFormResult()
+    } catch (e) {
+      console.error(e)
+      const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname
+      window.location.href = newUrl
+    }
   }
 
   await updateCanvasFront()
   await updateCanvas()
 
-  $('.loader').fadeOut();
+  $('.loader').fadeOut()
 })
 
 document.getElementById('download-front').addEventListener('click', function() {
@@ -688,7 +710,8 @@ $('form').submit(function(e) {
     processData: false,
     success: function(sachet) {
       sachetId = sachet.id
-      const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?id=' + sachet.id
+      sachetHash = sachet.hashedId
+      const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?id=' + sachetHash
       window.history.pushState({ path: newUrl }, 'GEL + FRANCE - Configurateur 3D', newUrl)
 
       $button.html(oldContent)
@@ -709,6 +732,6 @@ $('form').submit(function(e) {
 })
 
 $('.btn-back').click(function() {
-  const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?uxv&id=' + sachetId
+  const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?uxv&id=' + sachetHash
   window.location.href = newUrl
 })

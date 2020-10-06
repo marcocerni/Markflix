@@ -2,6 +2,7 @@ import config from '../config/config'
 import { Sachet } from '../entity/Sachet'
 import { ImageService } from './ImageService'
 import * as nodemailer from 'nodemailer'
+import * as sendinBlue from 'nodemailer-sendinblue-transport'
 
 export class EmailService {
   private transporter: any
@@ -14,6 +15,11 @@ export class EmailService {
         pass: config.email.password,
       },
     })
+
+    // this.transporter = nodemailer.createTransport(sendinBlue({
+    //   apiKey: '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',
+    //   apiUrl: 'https://api.sendinblue.com/v3',
+    // }))
   }
 
   sendMail(toEmail: string, subject: string, body: string, logo?: Buffer): Promise<object> {
@@ -39,7 +45,7 @@ export class EmailService {
   sendNewSachetCreatedEmail(sachet: Sachet) {
     const subject = 'GEL + FRANCE - Nouveau sachet créé'
 
-    const linkUrl = `${config.host}/?uxv&id=${sachet.id}`;
+    const linkUrl = `${sachet.link}&uxv`;
 
     const body = `<div>
         <p>Bonjour,</p>
@@ -56,13 +62,12 @@ export class EmailService {
   async sendNewSachetCreatedEmailClient(sachet: Sachet, contentEmail?: string) {
     const subject = 'GEL + FRANCE - Nouveau sachet créé'
 
-    const linkUrl = `${config.host}/?id=${sachet.id}`;
-    const linkHtml = `<a href="${linkUrl}">${linkUrl}</a>`;
+    const linkHtml = `<a href="${sachet.link}">${sachet.link}</a>`;
     const buyUrl = 'https://www.gelplusfrance.com/product-page/sachet-personnalisable'
 
     let body = `<div>
         <p>Bonjour,</p>
-        <p>Veuillez trouver ci-joint le visuel 3D du sachet crée référence <b>${sachet.id}</b> : <a href="${linkUrl}">${linkUrl}</a>
+        <p>Veuillez trouver ci-joint le visuel 3D du sachet crée référence <b>${sachet.id}</b> : <br/> ${linkHtml}
         <br/>Pour commander, cliquer sur ce lien : <a href="${buyUrl}">${buyUrl}</a>
         </p>
         <p></p>

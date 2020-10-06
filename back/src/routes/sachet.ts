@@ -14,6 +14,12 @@ router.get(
   SachetController.getOneById,
 )
 
+router.get(
+  '/:id/logo',
+  [],
+  SachetController.getLogo,
+)
+
 const upload = multer({ storage: multer.memoryStorage() });
 
 router.post('/', [upload.any()], SachetController.newSachet)

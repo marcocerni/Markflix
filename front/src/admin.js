@@ -2,6 +2,7 @@ import Toastify from 'toastify-js'
 
 const loginUrl = `${backUrl}/auth/login`
 const postUrl = `${backUrl}/sachet/massive`
+const getAllSachetsUrl = `${backUrl}/sachet`
 let editor, csv
 
 $(document).ready(() => {
@@ -13,12 +14,21 @@ $(document).ready(() => {
       const buyUrl = 'https://www.gelplusfrance.com/product-page/sachet-personnalisable'
 
       const body = `<div>
+        <table cellspacing="0" cellpadding="0" style="    border-collapse: collapse;">
+<tbody>
+    <tr>
+    <td><p>{SACHET_IMAGE}</p></td>
+    <td>        
         <p>Bonjour,</p>
-        <p>Nous vous présentons un concept innovant :  un sachet mono dose de gel hydroalcoolique personnalisable à l’identité visuelle de votre établissement. Il s’agit d’un véritable support de communication / marketing, et d’un objet répondant aux besoins de la crise sanitaire, un acte de bienveillance pour la santé de vos clients, de vos partenaires puisque 80% des maladies infectieuses se transmettent par les mains.</p>
-        <p>La fabrication de Gel + France est 100% Française, l’emballage est recyclable, le gel est actif sur les virus, bactéries et une partie des bénéfices de chaque sachet vendu est reversée aux hôpitaux de France afin de soutenir les soignants. Le sachet est entièrement personnalisable.</p>
-        <p>Pour illustrer le concept, nous sommes heureux de vous présenter un exemple d’échantillon de sachet mono dose de gel hydroalcoolique personnalisé à votre identité visuelle * :</p>
-        <p>{SACHET_IMAGE}</p>
-        <p>Pour visualiser le sachet en 3D, cliquez sur le lien crée ref <b>{ID_SACHET}</b> : <br/>{SACHET_LINK}
+        <p>Nous vous présentons un concept innovant : <b>un sachet mono dose de gel hydroalcoolique personnalisable à l’identité visuelle de votre établissement.</b></p>
+        <p>Il s’agit d’un véritable support de communication / marketing, et d’un objet répondant aux besoins de la crise sanitaire, un acte de bienveillance pour la santé de vos clients, de vos partenaires puisque 80% des maladies infectieuses se transmettent par les mains.</p>
+    </td>
+    </tr>
+</tbody>
+</table>
+        <p>La fabrication de Gel + France est 100% Française, l’emballage est recyclable, le gel est actif sur les virus, bactéries et une partie des bénéfices de chaque sachet vendu est reversée aux hôpitaux de France afin de soutenir les soignants. Le sachet est entièrement personnalisable.</p>
+        <p>Pour illustrer le concept, <b>vous pouvez visualiser le sachet en 3D</b> :</p>
+        <p>Cliquez sur le lien crée ref <b>{ID_SACHET}</b> : {SACHET_LINK}
         <br/>Dans l’attente de vous lire ou de vous entendre, nous vous prions d’agréer, l’expression de nos respectueuses salutations.
         </p>
         <p></p>
@@ -81,6 +91,50 @@ $('#login-form').submit(function(e) {
   return false
 })
 
+document.getElementById('download-all').addEventListener('click', function() {
+// function(e) {
+//   e.preventDefault()
+
+  const $button = $(this)
+
+  const oldContent = $button.html()
+  $button.html(oldContent + ' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+  $button.prop('disabled', true)
+
+  $.ajax({
+    url: getAllSachetsUrl,
+    type: 'GET',
+    headers: {
+      'Authorization': `Bearer ${window.localStorage.getItem('session')}`,
+    },
+    success: (sachets) => {
+      $button.html(oldContent)
+      $button.prop('disabled', false)
+
+      const csvContent = sachets.map(sachet => Object.values(sachet).map(v => `"${v}"`).join(';')).join('\n')
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+
+      console.log(blob);
+
+      var link = document.createElement('a');
+      link.href = URL.createObjectURL(blob)
+      link.download = 'sachets.csv'
+      link.click();
+    },
+    error: (error) => {
+      Toastify({
+        text: error.statusText,
+        duration: 3000,
+        backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
+      }).showToast()
+
+      console.error(error)
+      $button.html(oldContent)
+      $button.prop('disabled', false)
+    },
+  })
+}, false)
+
 function loadFile(file) {
   return new Promise((resolve, reject) => {
     let fr = new FileReader()
@@ -105,14 +159,22 @@ $(document).on('change', '#csv-file', (e) => {
 
 
     loadFile(e.target.files[0]).then((fileString) => {
-      const lines = fileString.split('\n').filter(line => line.length > 5)
+      // const lines = fileString.split('\n').filter(line => line.length > 5)
+      //
+      // csv = lines.map(line => {
+      //   const [firstField, firstRemaining] = line.split(/;(.+)/)
+      //   const [secondField, thirdField] = firstRemaining.split(/;(.+)/)
+      //
+      //   return [firstField, secondField, thirdField]
+      // })
 
-      csv = lines.map(line => {
-        const [firstField, firstRemaining] = line.split(/;(.+)/)
-        const [secondField, thirdField] = firstRemaining.split(/;(.+)/)
+      fileString = fileString.replace(/;base64/g, '!base64!');
 
-        return [firstField, secondField, thirdField]
-      })
+      csv = CSVToArray(fileString, ';').filter(line => line.length > 1).map((line) => {
+        line[2] = line[2].replace(/!base64!/g, ';base64');
+
+        return line;
+      });
 
       const html = csv.reduce((html, line, index) => {
 
@@ -122,8 +184,8 @@ $(document).on('change', '#csv-file', (e) => {
             <td>${line[0]}</td>
             <td>${line[1]}</td>
             <td><img src="${line[2]}" class="logo-image"/></td>
-            <td></td>
-            <td></td>
+            <td>${line[3] ? line[3] : ''}</td>
+            <td>${line[4] ? `<a href="${line[4]}" target="_blank">${line[4]}</a>` : ''}</td>
         </tr>`
 
         return html
@@ -140,6 +202,8 @@ $(document).on('change', '#csv-file', (e) => {
         duration: 3000,
         backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
       }).showToast()
+
+      console.error(error);
 
       $('#send-emails').prop('disabled', false)
       $('#save-sachets').prop('disabled', false)
@@ -203,7 +267,7 @@ $(document).on('click', '#send-emails, #save-sachets', (e) => {
         const tds = $($('.csv-content tr').get(rowNumber)).find('td')
 
         tds[tds.length-2].innerHTML = sachet.id
-        tds[tds.length-1].innerHTML = sachet.link
+        tds[tds.length-1].innerHTML = `<a href="${sachet.link}" target="_blank">${sachet.link}</a>`
 
         csv[rowNumber].push(sachet.id, sachet.link)
       })
@@ -240,4 +304,86 @@ $(document).on('change', '.check-all', function(event) {
   })
 })
 
+/* CSV Parsing */
+function CSVToArray(strData, strDelimiter) {
+  // Check to see if the delimiter is defined. If not,
+  // then default to comma.
+  strDelimiter = (strDelimiter || ",");
 
+  // Create a regular expression to parse the CSV values.
+  var objPattern = new RegExp(
+    (
+      // Delimiters.
+      "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+
+      // Quoted fields.
+      "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+
+      // Standard fields.
+      "([^\"\\" + strDelimiter + "\\r\\n]*))"
+    ),
+    "gi"
+  );
+
+
+  // Create an array to hold our data. Give the array
+  // a default empty first row.
+  var arrData = [[]];
+
+  // Create an array to hold our individual pattern
+  // matching groups.
+  var arrMatches = null;
+
+
+  // Keep looping over the regular expression matches
+  // until we can no longer find a match.
+  while (arrMatches = objPattern.exec(strData)) {
+
+    // Get the delimiter that was found.
+    var strMatchedDelimiter = arrMatches[1];
+
+    // Check to see if the given delimiter has a length
+    // (is not the start of string) and if it matches
+    // field delimiter. If id does not, then we know
+    // that this delimiter is a row delimiter.
+    if (
+      strMatchedDelimiter.length &&
+      strMatchedDelimiter !== strDelimiter
+    ) {
+
+      // Since we have reached a new row of data,
+      // add an empty row to our data array.
+      arrData.push([]);
+
+    }
+
+    var strMatchedValue;
+
+    // Now that we have our delimiter out of the way,
+    // let's check to see which kind of value we
+    // captured (quoted or unquoted).
+    if (arrMatches[2]) {
+
+      // We found a quoted value. When we capture
+      // this value, unescape any double quotes.
+      strMatchedValue = arrMatches[2].replace(
+        new RegExp("\"\"", "g"),
+        "\""
+      );
+
+    } else {
+
+      // We found a non-quoted value.
+      strMatchedValue = arrMatches[3];
+
+    }
+
+
+    // Now that we have our value string, let's add
+    // it to the data array.
+    arrData[arrData.length - 1].push(strMatchedValue);
+  }
+
+  return (arrData);
+}
+/* CSV Parsing */

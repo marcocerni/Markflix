@@ -22,7 +22,6 @@ import config from "./config/config";
         app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
         // app.use(multipart());
 
-
         //Set all routes from routes folder
         app.use("/", routes);
 
