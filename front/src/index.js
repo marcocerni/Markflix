@@ -209,7 +209,7 @@ function loadSachet(id) {
         sachetId = sachet.id
         sachetHash = sachet.hashedId
 
-        if (sachet.logo && (isDataURL(sachet.logo) || isURL(sachet.logo))) {
+        if (sachet.logo && (isDataURL(sachet.logo))) {
           parameters['logo-file'] = sachet.logo
         } else {
           parameters['logo-file'] = sachet.logo ? `${imagePublicPath}/${sachet.logo}` : null
@@ -296,11 +296,11 @@ function loadImage(imagePath) {
     image.onerror = (err) => {
       reject(err)
     }
-    if (isURL(imagePath)) {
-      image.src = `${sachetUrl}/${sachetHash}/logo`
-    } else {
+    // if (isURL(imagePath)) {
+    //   image.src = `${sachetUrl}/${sachetHash}/logo`
+    // } else {
       image.src = imagePath
-    }
+    // }
   })
 }
 
@@ -583,8 +583,6 @@ const updateCanvasFront = async () => {
           const dx = LOGO_CENTER_X - (width / 2)
           const dy = LOGO_CENTER_Y - (height / 2)
 
-          console.log(image)
-
           contextFront.drawImage(image, dx, dy, width, height)
         } else {
 
@@ -592,7 +590,6 @@ const updateCanvasFront = async () => {
         }
       })
     }).then(() => {
-      console.log('loadtext', canvasFront)
       return loadTexture(canvasFront.toDataURL(), true)
     }).catch((err) => {
       console.error(err)
