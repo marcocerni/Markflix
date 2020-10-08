@@ -77,11 +77,11 @@ export class EmailService {
     let logo;
 
     if (contentEmail) {
-      const styleTag = `<style>.sachet-container { position:relative } 
-      .sachet-container .img-sachet {width: 200px;} 
-      .sachet-container .img-logo {position: absolute;left: 31px;top: 72px;width: 138px;}</style>`
+      const styleTag = `<style>.sachet-container { } 
+      .sachet-container .img-sachet {width: 100px;} 
+      .sachet-container .img-logo {width: 100px;}</style>`
 
-      const imageTag = `${styleTag}<div class="sachet-container" style="position:relative"><img src="cid:logo" class="img-logo" style="position: absolute;left: 31px;top: 72px;width: 138px;" /></div>`
+      const imageTag = `${styleTag}<div class="sachet-container"><img src="cid:logo" class="img-logo" style="width: 100px;" /></div>`
 
       body = contentEmail
         .replace(/{ID_SACHET}/g, sachet.id.toString())

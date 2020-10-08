@@ -251,7 +251,6 @@ function loadSachet(id) {
         $('[name="back-font-color"]').val(sachet.backColor)
         if (sachet.backColor && sachet.backColor !== $('[name="back-font-color"]').data('default-value')) addCloseButtonToInput($('[name="back-font-color"]')[0])
 
-
         parameters['email'] = sachet.email
         $('[name="email"]').val(sachet.email)
         $('[name="email"]').hide()
@@ -457,7 +456,7 @@ const updateCanvas = async () => {
   const imageSourcesSachet = [$('#DessinDosSachet')[0], $('#TextDosSachet')[0]]
 
   await Promise.all(imageSourcesSachet.map((image, index) => {
-    if (index !== imageSources.length - 1) {
+    if (index !== imageSourcesSachet.length - 1) {
       return loadImage(image)
     } else {
       return loadImage(image).then((image) => {
@@ -476,17 +475,18 @@ const updateCanvas = async () => {
 
 // const LOGO_CENTER_X = 2217 (665), LOGO_CENTER_Y = 3000, LOGO_MAX_WIDTH = 3000, LOGO_MAX_HEIGHT = 4000
 
-const LOGO_CENTER_X = 665, LOGO_CENTER_Y = 900, LOGO_MAX_WIDTH = 950, LOGO_MAX_HEIGHT = 1200
-const CANVAS_WIDTH = 1330, CANVAS_HEIGHT = 2177
-const BORDER_WIDTH = 200, BORDER_HEIGHT = 200
+// const LOGO_CENTER_X = 665, LOGO_CENTER_Y = 900, LOGO_MAX_WIDTH = 950, LOGO_MAX_HEIGHT = 1200
+// const CANVAS_WIDTH = 1330, CANVAS_HEIGHT = 2177
+// const BORDER_WIDTH = 200, BORDER_HEIGHT = 200
 
-// const LOGO_CENTER_X = 1330, LOGO_CENTER_Y = 1800, LOGO_MAX_WIDTH = 1900, LOGO_MAX_HEIGHT = 2400
-// const CANVAS_WIDTH = 2660, CANVAS_HEIGHT = 4354
-// const BORDER_WIDTH = 400, BORDER_HEIGHT = 400
+const LOGO_CENTER_X = 1330, LOGO_CENTER_Y = 1800, LOGO_MAX_WIDTH = 1900, LOGO_MAX_HEIGHT = 2400
+const CANVAS_WIDTH = 2660, CANVAS_HEIGHT = 4354
+const BORDER_WIDTH = 400, BORDER_HEIGHT = 400
 
 const DX = BORDER_WIDTH, DY = BORDER_HEIGHT, BACKGROUND_WIDTH = CANVAS_WIDTH - (2 * BORDER_WIDTH),
   BACKGROUND_HEIGHT = CANVAS_HEIGHT - (2 * BORDER_HEIGHT)
 const BORDER_WIDTH_F = 320, BORDER_HEIGHT_F = 350
+// const BORDER_WIDTH_F = 640, BORDER_HEIGHT_F = 700
 const DX_F = BORDER_WIDTH_F, DY_F = BORDER_HEIGHT_F, BACKGROUND_WIDTH_F = CANVAS_WIDTH - (2 * BORDER_WIDTH_F),
   BACKGROUND_HEIGHT_F = CANVAS_HEIGHT - (2 * BORDER_HEIGHT_F)
 
