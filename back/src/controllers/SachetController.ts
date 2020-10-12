@@ -255,7 +255,7 @@ class SachetController {
       const emailService = new EmailService()
 
       await Promise.all(sachets.map((sachet: Sachet) => {
-        return emailService.sendNewSachetCreatedEmailClient(sachet, content)
+        return emailService.sendNewSachetCreatedEmailClient(sachet, content, `Votre sachet de gel hydroalcoolique monodose personnalisé`)
       }))
 
       console.timeEnd('entro email')

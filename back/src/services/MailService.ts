@@ -24,28 +24,28 @@ export class EmailService {
 
   sendMail(toEmail: string, subject: string, body: string, logo?: Buffer): Promise<object> {
 
-    let attachments = [];
+    let attachments = []
 
     if (logo) {
-      attachments =  [{
+      attachments = [{
         content: logo,
         cid: 'logo',
-        filename: 'logo.jpg'
-      }];
+        filename: 'logo.jpg',
+      }]
     }
 
     return this.transporter.sendMail({
       to: toEmail,
       subject: subject,
       html: body,
-      attachments: attachments
+      attachments: attachments,
     })
   }
 
   sendNewSachetCreatedEmail(sachet: Sachet) {
     const subject = 'GEL + FRANCE - Nouveau sachet créé'
 
-    const linkUrl = `${sachet.link}&uxv`;
+    const linkUrl = `${sachet.link}&uxv`
 
     const body = `<div>
         <p>Bonjour,</p>
@@ -54,15 +54,14 @@ export class EmailService {
         </p>
         <p></p>
         <p>Cordialement</p>
-        </div>`;
+        </div>`
 
-    return this.sendMail(config.emailTo, subject, body);
+    return this.sendMail(config.emailTo, subject, body)
   }
 
-  async sendNewSachetCreatedEmailClient(sachet: Sachet, contentEmail?: string) {
-    const subject = 'GEL + FRANCE - Nouveau sachet créé'
+  async sendNewSachetCreatedEmailClient(sachet: Sachet, contentEmail?: string, subject = 'GEL + FRANCE - Nouveau sachet créé') {
 
-    const linkHtml = `<a href="${sachet.link}">${sachet.link}</a>`;
+    const linkHtml = `<a href="${sachet.link}">${sachet.link}</a>`
     const buyUrl = 'https://www.gelplusfrance.com/product-page/sachet-personnalisable'
 
     let body = `<div>
@@ -72,16 +71,17 @@ export class EmailService {
         </p>
         <p></p>
         <p>Bien Cordialement<br><a href="https://www.gelplusfrance.com/">https://www.gelplusfrance.com/</a></p>
-        </div>`;
+        </div>`
 
-    let logo;
+    let logo
 
     if (contentEmail) {
       const styleTag = `<style>.sachet-container { } 
       .sachet-container .img-sachet {width: 100px;} 
       .sachet-container .img-logo {width: 100px;}</style>`
 
-      const imageTag = `${styleTag}<div class="sachet-container"><img src="cid:logo" class="img-logo" style="width: 100px;" /></div>`
+      const imageTag = `${styleTag}<div class="sachet-container"><img src="cid:logo" class="img-logo" 
+            style="width: 100px;margin: 0;border: 0;padding: 0;display: block;" width="100" /></div>`
 
       body = contentEmail
         .replace(/{ID_SACHET}/g, sachet.id.toString())
@@ -91,6 +91,6 @@ export class EmailService {
       logo = await ImageService.createSachetImage(sachet.logo)
     }
 
-    return this.sendMail(sachet.email, subject, body, logo);
+    return this.sendMail(sachet.email, subject, body, logo)
   }
 }
