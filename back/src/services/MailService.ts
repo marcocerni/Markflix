@@ -40,11 +40,21 @@ export class EmailService {
   sendNewSachetCreatedEmail(sachet: Sachet) {
     const subject = 'GEL + FRANCE - Nouveau sachet créé'
 
-    const linkUrl = `${sachet.link}&uxv`
+    const linkHtml = `<table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td>
+            <table border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td align="center" style="border-radius: 3px;" bgcolor="#205685"><a href="${sachet.link}&uxv" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; text-decoration: none;border-radius: 3px; padding: 12px 18px; border: 1px solid #205685; display: inline-block;">Visualisation en 3D</a></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>`
 
     const body = `<div>
         <p>Bonjour,</p>
-        <p>Un nouveau sachet a été créé: <a href="${linkUrl}">${linkUrl}</a>
+        <p>Un nouveau sachet a été créé: <br/> ${linkHtml}
         <br/>Email: <a href="mailto:${sachet.email}">${sachet.email}</a>
         </p>
         <p></p>
