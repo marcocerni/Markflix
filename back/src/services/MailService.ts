@@ -2,7 +2,6 @@ import config from '../config/config'
 import { Sachet } from '../entity/Sachet'
 import { ImageService } from './ImageService'
 import * as nodemailer from 'nodemailer'
-import * as sendinBlue from 'nodemailer-sendinblue-transport'
 
 export class EmailService {
   private transporter: any
@@ -14,7 +13,7 @@ export class EmailService {
         user: config.email.user,
         pass: config.email.password,
       },
-    });
+    })
   }
 
   sendMail(toEmail: string, subject: string, body: string, logo?: Buffer): Promise<object> {
@@ -57,7 +56,18 @@ export class EmailService {
 
   async sendNewSachetCreatedEmailClient(sachet: Sachet, contentEmail?: string, subject = 'GEL + FRANCE - Nouveau sachet créé') {
 
-    const linkHtml = `<a href="${sachet.link}">${sachet.link}</a>`
+    const linkHtml = `<table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td>
+            <table border="0" cellspacing="0" cellpadding="0">
+              <tr>
+                <td align="center" style="border-radius: 3px;" bgcolor="#205685"><a href="${sachet.link}" target="_blank" style="font-size: 16px; font-family: Helvetica, Arial, sans-serif; color: #ffffff; text-decoration: none; text-decoration: none;border-radius: 3px; padding: 12px 18px; border: 1px solid #205685; display: inline-block;">Visualisation en 3D</a></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>`
+    // const linkHtml = `<a href="${sachet.link}">${sachet.link}</a>`
     const buyUrl = 'https://www.gelplusfrance.com/product-page/sachet-personnalisable'
 
     let body = `<div>

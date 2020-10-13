@@ -15,26 +15,28 @@ $(document).ready(() => {
 
       const body = `<div>
         <table cellspacing="0" cellpadding="0" style="    border-collapse: collapse;">
-<tbody>
-    <tr>
-    <td>{SACHET_IMAGE}</td>
-    <td>        
-        <p>Bonjour,</p>
-        <p>Nous vous présentons un concept innovant : <b>un sachet mono dose de gel hydroalcoolique personnalisable à l’identité visuelle de votre établissement.</b></p>
-        <p>Il s’agit d’un véritable support de communication / marketing, et d’un objet répondant aux besoins de la crise sanitaire, un acte de bienveillance pour la santé de vos clients, de vos partenaires puisque 80% des maladies infectieuses se transmettent par les mains.</p>
-    </td>
-    </tr>
-    <tr><td colspan="2">
-            <p>La fabrication de Gel + France est 100% Française, l’emballage est recyclable, le gel est actif sur les virus, bactéries et une partie des bénéfices de chaque sachet vendu est reversée aux hôpitaux de France afin de soutenir les soignants. Le sachet est entièrement personnalisable.</p>
-        <p>Pour illustrer le concept, <b>vous pouvez visualiser le sachet en 3D</b> :</p>
-        <p>Cliquez sur le lien crée ref <b>{ID_SACHET}</b> : {SACHET_LINK}
-        <br/>Dans l’attente de vous lire ou de vous entendre, nous vous prions d’agréer, l’expression de nos respectueuses salutations.
-        </p>
-        <p></p>
-        <p>L’équipe Gel + France<br><a href="https://www.gelplusfrance.com/">https://www.gelplusfrance.com/</a><br/>SA JPS – Gelplusfrance<br/>71, Rue Réaumur 75002 Paris<br/>Tél. 01.42.78.65.89</p>
-</td></tr>
-</tbody>
-</table>
+          <tbody>
+              <tr>
+              <td>{SACHET_IMAGE}</td>
+              <td>        
+                <p>Bonjour,</p>
+                <p>Nous vous présentons un concept innovant : <b>un sachet mono dose de gel hydroalcoolique personnalisable à l’identité visuelle de votre établissement.</b></p>
+                <p>Il s’agit d’un véritable support de communication / marketing, et d’un objet répondant aux besoins de la crise sanitaire, un acte de bienveillance pour la santé de vos clients, de vos partenaires puisque 80% des maladies infectieuses se transmettent par les mains.</p>
+            </td>
+            </tr>
+            <tr><td colspan="2">
+                <p>La fabrication de Gel + France est 100% Française, l’emballage est recyclable, le gel est actif sur les virus, bactéries et une partie des bénéfices de chaque sachet vendu est reversée aux hôpitaux de France afin de soutenir les soignants. Le sachet est entièrement personnalisable.</p>
+                <p>Pour illustrer le concept, <b>vous pouvez visualiser le sachet en 3D</b> :</p>
+                <p>Cliquez sur le lien crée ref <b>{ID_SACHET}</b> : <br> {SACHET_LINK}
+                <p>N’hésitez pas à nous faire une demande d’échantillon personnalisé gratuit!</p>
+                <br/>
+                Dans l’attente de vous lire ou de vous entendre, nous vous prions d’agréer, l’expression de nos respectueuses salutations.
+                </p>
+                <p></p>
+                <p>L’équipe Gel + France<br><a href="https://www.gelplusfrance.com/">https://www.gelplusfrance.com/</a><br/>SA JPS – Gelplusfrance<br/>71, Rue Réaumur 75002 Paris<br/>Tél. 01.42.78.65.89</p>
+        </td></tr>
+        </tbody>
+        </table>
         </div>`
 
       editor.data.set(body)
