@@ -6,9 +6,10 @@ export default {
     expiration: "1h"
   },
   email: {
-    service: 'gmail',
+    service: 'gmail', //'SendinBlue'
     user: 'gelplusfrance@gmail.com',
     password: 'XXXXXXXXXXX',
+    fromUser: 'gelplusfrance@gmail.com',
   },
   emailTo: 'ivancerni@gmail.com',
   hashSalt: 'XXXXXXXXX'

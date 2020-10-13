@@ -14,12 +14,7 @@ export class EmailService {
         user: config.email.user,
         pass: config.email.password,
       },
-    })
-
-    // this.transporter = nodemailer.createTransport(sendinBlue({
-    //   apiKey: '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',
-    //   apiUrl: 'https://api.sendinblue.com/v3',
-    // }))
+    });
   }
 
   sendMail(toEmail: string, subject: string, body: string, logo?: Buffer): Promise<object> {
@@ -35,6 +30,7 @@ export class EmailService {
     }
 
     return this.transporter.sendMail({
+      from: config.email.fromUser,
       to: toEmail,
       subject: subject,
       html: body,
