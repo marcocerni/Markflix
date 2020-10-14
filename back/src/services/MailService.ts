@@ -107,6 +107,6 @@ export class EmailService {
       logo = await ImageService.createSachetImage(sachet.logo)
     }
 
-    return this.sendMail(sachet.email, subject, body, logo)
+    //return this.sendMail(sachet.email, subject, body, logo)
   }
 }

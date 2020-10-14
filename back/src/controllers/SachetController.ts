@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import { getRepository } from 'typeorm'
-import { validate } from 'class-validator'
+import { validate, ValidationError } from 'class-validator'
 import { Sachet } from '../entity/Sachet'
 import { ImageService } from '../services/ImageService'
 import { EmailService } from '../services/MailService'
@@ -231,8 +231,8 @@ class SachetController {
       const errors = await validate(sachet)
       if (errors.length > 0) {
         lineErrors.push({
-          i: index,
-          errors: errors,
+          i: (index+1),
+          errors: errors.map((error: ValidationError) => error.toString()).join(', '),
         })
       }
 
@@ -254,8 +254,14 @@ class SachetController {
       console.time('entro email')
       const emailService = new EmailService()
 
-      await Promise.all(sachets.map((sachet: Sachet) => {
+      await Promise.all(sachets.map((sachet: Sachet, index) => {
         return emailService.sendNewSachetCreatedEmailClient(sachet, content, `Votre sachet de gel hydroalcoolique monodose personnalisé`)
+          .catch((error) => {
+            lineErrors.push({
+              i: (index+1),
+              errors: error.message,
+            })
+          })
       }))
 
       console.timeEnd('entro email')

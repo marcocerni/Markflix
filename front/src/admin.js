@@ -278,6 +278,18 @@ $(document).on('click', '#send-emails, #save-sachets', (e) => {
 
       $button.html(oldContent)
       $button.prop('disabled', false)
+
+
+      if (response.errors.length) {
+        const html = response.errors.reduce((html, error) => {
+          return html + `<li>${error.i}: ${error.errors}</li>`
+        }, '<div class="alert alert-warning mt-2" role="alert"><h3>Line errors</h3><ul>')
+
+        $('.errors-container').html(`${html}</ul></div>`)
+        $('.errors-container').slideDown()
+      } else {
+        $('.errors-container').slideUp()
+      }
     },
     error: function(error) {
       Toastify({
