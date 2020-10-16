@@ -89,16 +89,16 @@ class SachetController {
 
         https.get(sachet.logo, (resImage) => {
           res.status(resImage.statusCode)
-          res.setHeader('Content-Type', resImage.headers['content-type']);
+          res.setHeader('Content-Type', resImage.headers['content-type'])
           resImage.pipe(res)
-        }).on('error', (error) => {
-          console.error(error);
+        }).on('error', (error) => {
+          console.error(error)
         })
       } else {
         res.send(sachet.logo)
       }
     } catch (error) {
-      console.error(error);
+      console.error(error)
       res.status(404).send('Sachet not found')
     }
   }
@@ -125,8 +125,10 @@ class SachetController {
 
     const emailService = new EmailService()
 
-    const result = await emailService.sendNewSachetCreatedEmail(sachet)
-    const result2 = await emailService.sendNewSachetCreatedEmailClient(sachet)
+    await Promise.all([
+      emailService.sendNewSachetCreatedEmail(sachet, false),
+      emailService.sendNewSachetCreatedEmailClient(sachet, undefined, undefined, false),
+    ])
 
     res.status(200).send(sachet)
   }
@@ -231,7 +233,7 @@ class SachetController {
       const errors = await validate(sachet)
       if (errors.length > 0) {
         lineErrors.push({
-          i: (index+1),
+          i: (index + 1),
           errors: errors.map((error: ValidationError) => error.toString()).join(', '),
         })
       }
@@ -250,7 +252,6 @@ class SachetController {
     }))
 
     if (sendEmails === 'true') {
-      console.log('entro email')
       console.time('entro email')
       const emailService = new EmailService()
 
@@ -258,7 +259,7 @@ class SachetController {
         return emailService.sendNewSachetCreatedEmailClient(sachet, content, `Votre sachet de gel hydroalcoolique monodose personnalisé`)
           .catch((error) => {
             lineErrors.push({
-              i: (index+1),
+              i: (index + 1),
               errors: error.message,
             })
           })

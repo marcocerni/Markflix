@@ -11,6 +11,12 @@ export default {
     password: 'XXXXXXXXXXX',
     fromUser: 'gelplusfrance@gmail.com',
   },
+  emailMassive: {
+    service: 'SendinBlue', //'gmail'
+    user: 'gelplusfrance@gmail.com',
+    password: 'XXXXXXXXXXX',
+    fromUser: 'gelplusfrance@gmail.com',
+  },
   emailTo: 'ivancerni@gmail.com',
   hashSalt: 'XXXXXXXXX'
 };

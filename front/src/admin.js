@@ -229,7 +229,7 @@ document.getElementById('download-rows').addEventListener('click', function() {
   this.download = fileName ? fileName : 'output.csv'
 }, false)
 
-$(document).on('click', '#send-emails, #save-sachets', (e) => {
+$(document).on('click', '#send-emails, #save-sachets', async (e) => {
   e.preventDefault()
 
   const sendEmails = $(e.target).attr('id') === 'send-emails'
@@ -248,64 +248,98 @@ $(document).on('click', '#send-emails, #save-sachets', (e) => {
   $button.html(oldContent + ' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
   $button.prop('disabled', true)
 
-  $.ajax({
-    url: postUrl,
-    type: 'POST',
-    headers: {
-      'Authorization': `Bearer ${window.localStorage.getItem('session')}`,
-    },
-    data: {
-      content: editor.getData(),
-      csv: csvFiltered,
-      sendEmails: sendEmails,
-    },
-    success: function(response) {
-      Toastify({
-        text: sendEmails ? 'Emails sent' : 'Sachets created',
-        duration: 3000,
-        backgroundColor: 'linear-gradient(to right, rgb(0, 176, 155), rgb(150, 201, 61))',
-      }).showToast()
 
-      response.sachets.forEach((sachet, index) => {
-        const rowNumber = selectedRows[index]
-        const tds = $($('.csv-content tr').get(rowNumber)).find('td')
+  $('.errors-container ul').html('')
+  $('.errors-container').slideUp()
 
-        tds[tds.length - 2].innerHTML = sachet.id
-        tds[tds.length - 1].innerHTML = `<a href="${sachet.link}" target="_blank">${sachet.link}</a>`
+  const sachetChunks = chunkArrayInGroups(csvFiltered, 100)
 
-        csv[rowNumber].push(sachet.id, sachet.link)
+  const errors = []
+  sachetChunks.reduce((current, sachetChunk, indexChunk) => {
+    return current.then(() => {
+      return doRequest({
+        url: postUrl,
+        type: 'POST',
+        headers: {
+          'Authorization': `Bearer ${window.localStorage.getItem('session')}`,
+        },
+        data: {
+          content: editor.getData(),
+          csv: sachetChunk,
+          sendEmails: sendEmails,
+        },
+      }).then((response) => {
+
+        response.sachets.forEach((sachet, index) => {
+          const rowNumber = selectedRows[index+(indexChunk*100)]
+          const tds = $($('.csv-content tr').get(rowNumber)).find('td')
+
+          tds[tds.length - 2].innerHTML = sachet.id
+          tds[tds.length - 1].innerHTML = `<a href="${sachet.link}" target="_blank">${sachet.link}</a>`
+
+          csv[rowNumber].push(sachet.id, sachet.link)
+        })
+
+        if (response.errors.length) {
+          const html = response.errors.reduce((html, error) => {
+            return html + `<li>${error.i}: ${error.errors}</li>`
+          }, '')
+
+          $('.errors-container ul').append(html)
+
+          if ($('.errors-container').is(':hidden'))
+            $('.errors-container').slideDown()
+        }
+
+        Toastify({
+          text: `Batch ${indexChunk+1}/${sachetChunks.length} processed`,
+          duration: 3000,
+          backgroundColor: 'linear-gradient(to right, rgb(0, 176, 155), rgb(150, 201, 61))',
+        }).showToast()
+
+      }).catch((error) => {
+        errors.push(error)
       })
+    })
+  }, Promise.resolve()).then(() => {
+    Toastify({
+      text: sendEmails ? 'All emails sent' : 'All sachets created',
+      duration: 3000,
+      backgroundColor: 'linear-gradient(to right, rgb(0, 176, 155), rgb(150, 201, 61))',
+    }).showToast()
 
-      $button.html(oldContent)
-      $button.prop('disabled', false)
+    $button.html(oldContent)
+    $button.prop('disabled', false)
 
-
-      if (response.errors.length) {
-        const html = response.errors.reduce((html, error) => {
-          return html + `<li>${error.i}: ${error.errors}</li>`
-        }, '<div class="alert alert-warning mt-2" role="alert"><h3>Line errors</h3><ul>')
-
-        $('.errors-container').html(`${html}</ul></div>`)
-        $('.errors-container').slideDown()
-      } else {
-        $('.errors-container').slideUp()
-      }
-    },
-    error: function(error) {
-      Toastify({
-        text: error.statusText,
-        duration: 3000,
-        backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
-      }).showToast()
-
-      console.error(error)
-      $button.html(oldContent)
-      $button.prop('disabled', false)
-    },
+    console.log(errors)
   })
 
   return false
 })
+
+function chunkArrayInGroups(arr, size) {
+  const chunks = []
+
+  for (let i = 0; i < arr.length; i += size) {
+    chunks.push(arr.slice(i, i + size))
+  }
+
+  return chunks
+}
+
+function doRequest(params) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      ...params,
+      success: (response) => {
+        resolve(response)
+      },
+      error: (error) => {
+        reject(error)
+      },
+    })
+  })
+}
 
 $(document).on('change', '.check-all', function(event) {
   const $checkbox = $(event.target)

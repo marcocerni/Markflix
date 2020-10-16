@@ -5,6 +5,7 @@ import * as nodemailer from 'nodemailer'
 
 export class EmailService {
   private transporter: any
+  private transporterMassive: any
 
   constructor() {
     this.transporter = nodemailer.createTransport({
@@ -14,9 +15,17 @@ export class EmailService {
         pass: config.email.password,
       },
     })
+
+    this.transporterMassive = nodemailer.createTransport({
+      service: config.emailMassive.service,
+      auth: {
+        user: config.emailMassive.user,
+        pass: config.emailMassive.password,
+      },
+    })
   }
 
-  sendMail(toEmail: string, subject: string, body: string, logo?: Buffer): Promise<object> {
+  sendMail(toEmail: string, subject: string, body: string, logo?: Buffer, massive = true): Promise<object> {
 
     let attachments = []
 
@@ -28,8 +37,10 @@ export class EmailService {
       }]
     }
 
-    return this.transporter.sendMail({
-      from: config.email.fromUser,
+    const transporter = massive ? this.transporterMassive : this.transporter;
+
+    return transporter.sendMail({
+      from: massive ? config.emailMassive.fromUser : config.email.fromUser,
       to: toEmail,
       subject: subject,
       html: body,
@@ -37,7 +48,7 @@ export class EmailService {
     })
   }
 
-  sendNewSachetCreatedEmail(sachet: Sachet) {
+  sendNewSachetCreatedEmail(sachet: Sachet, massive = true) {
     const subject = 'GEL + FRANCE - Nouveau sachet créé'
 
     const linkHtml = `<table width="100%" border="0" cellspacing="0" cellpadding="0">
@@ -61,10 +72,10 @@ export class EmailService {
         <p>Cordialement</p>
         </div>`
 
-    return this.sendMail(config.emailTo, subject, body)
+    return this.sendMail(config.emailTo, subject, body, undefined, massive)
   }
 
-  async sendNewSachetCreatedEmailClient(sachet: Sachet, contentEmail?: string, subject = 'GEL + FRANCE - Nouveau sachet créé') {
+  async sendNewSachetCreatedEmailClient(sachet: Sachet, contentEmail?: string, subject = 'GEL + FRANCE - Nouveau sachet créé', massive = true) {
 
     const linkHtml = `<table width="100%" border="0" cellspacing="0" cellpadding="0">
         <tr>
@@ -107,6 +118,6 @@ export class EmailService {
       logo = await ImageService.createSachetImage(sachet.logo)
     }
 
-    return this.sendMail(sachet.email, subject, body, logo)
+    return this.sendMail(sachet.email, subject, body, logo, massive)
   }
 }
