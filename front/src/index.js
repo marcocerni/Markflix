@@ -377,7 +377,7 @@ $('form').submit(function(e) {
   $button.prop('disabled', true)
 
   $.ajax({
-    url: sachetId ? `${sachetUrl}/${sachetId}` : sachetUrl,
+    url: sachetId ? `${sachetUrl}/${sachetHash}` : sachetUrl,
     type: sachetId ? 'PATCH' : 'POST',
     data: new FormData($(this)[0]),
     cache: false,
