@@ -16,6 +16,7 @@ import {
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import SachetImageGenerator, { loadFile } from './SachetImageGenerator'
 
 //https://stackoverflow.com/questions/923885/capture-html-canvas-as-gif-jpg-png-pdf
 //https://stackoverflow.com/questions/158750/can-you-combine-multiple-images-into-a-single-one-using-javascript
@@ -31,9 +32,7 @@ const textureLoader = new TextureLoader()
 
 let camera, scene, renderer, controls
 let plane, mouse, raycaster
-let paramFront, paramBack
 let sachet, frontSachet, backSachet
-
 
 function init() {
   return new Promise((resolve, reject) => {
@@ -180,25 +179,7 @@ const getUrlParameter = function getUrlParameter(sParam) {
   }
 }
 
-/* RE DRAWING */
-const canvas = document.getElementById('canvas')
-const context = canvas.getContext('2d')
-const canvasFront = document.getElementById('canvas-front')
-const contextFront = canvasFront.getContext('2d')
-
-const parameters = {
-  'logo-file': null,
-  'sides-opacity': 50,
-  'face-color': '#ffffff',
-  'face-file': null,
-  'face-opacity': 100,
-  'face-font-color': '#000000',
-  'back-color': '#ffffff',
-  'back-file': null,
-  'back-opacity': 100,
-  'back-font-color': '#000000',
-  'email': null,
-}
+const parameters = SachetImageGenerator.getDefaultParameters()
 
 function loadSachet(id) {
   return new Promise((resolve, reject) => {
@@ -280,60 +261,16 @@ function isURL(s) {
 isDataURL.regexData = /^\s*data:([a-z]+\/[a-z]+(;[a-z\-]+\=[a-z\-]+)?)?(;base64)?,[a-z0-9\!\$\&\'\,\(\)\*\+\,\;\=\-\.\_\~\:\@\/\?\%\s]*\s*$/i
 isDataURL.regexUrl = /(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_\+.~#?&//=]*)/g
 
-
-function loadImage(imagePath) {
-
-  if (typeof imagePath === 'object') {
-    return Promise.resolve(imagePath)
-  }
-
-  return new Promise((resolve, reject) => {
-    let image = new Image()
-    image.onload = () => {
-      resolve(image)
-    }
-    image.onerror = (err) => {
-      reject(err)
-    }
-    // if (isURL(imagePath)) {
-    //   image.src = `${sachetUrl}/${sachetHash}/logo`
-    // } else {
-      image.src = imagePath
-    // }
-  })
-}
-
-function filterImage(image, color) {
-  const c = document.createElement('canvas')
-  const cctx = c.getContext('2d')
-  c.width = CANVAS_WIDTH
-  c.height = CANVAS_HEIGHT
-
-  cctx.globalCompositeOperation = 'source-over'
-  cctx.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-
-  cctx.fillStyle = color //'rgba(217, 87, 83, 1)'
-  cctx.fillRect(0, 0, c.width, c.height)
-
-  cctx.globalCompositeOperation = 'destination-in'
-  cctx.drawImage(image, 0, 0, c.width, c.height)
-
-  // reset comp. mode to default
-  cctx.globalCompositeOperation = 'source-over'
-
-  return loadImage(c.toDataURL())
-}
-
-function loadFile(file) {
-  return new Promise((resolve, reject) => {
-    let fr = new FileReader()
-    fr.onload = () => {
-      resolve(fr)
-    }
-    fr.onerror = (err) => {
-      reject(err)
-    }
-    fr.readAsDataURL(file)
+function renderAllImages(parameters) {
+  Promise.all([
+    sachetGenerator.updateCanvasFront(parameters).then(() => {
+      return loadTexture(sachetGenerator.getResultFront(), true)
+    }),
+    sachetGenerator.updateCanvas(parameters).then(() => {
+      return loadTexture(sachetGenerator.getResultBack(), false)
+    }),
+  ]).then(() => {
+    return sachetGenerator.generatePrintImage(parameters)
   })
 }
 
@@ -344,8 +281,8 @@ $(document).on('change', 'input', (e) => {
 
     loadFile(e.target.files[0]).then((fr) => {
       parameters[e.target.name] = fr.result
-      updateCanvasFront()
-      updateCanvas()
+
+      renderAllImages(parameters)
     })
 
     addCloseButtonToInput(e.target)
@@ -356,8 +293,7 @@ $(document).on('change', 'input', (e) => {
     if (e.target.value !== e.target.getAttribute('data-default-value') && e.target.type === 'color')
       addCloseButtonToInput(e.target)
 
-    updateCanvasFront()
-    updateCanvas()
+    renderAllImages(parameters)
   }
 })
 
@@ -382,263 +318,7 @@ $(document).on('click', '.remove-button', (e) => {
   $(e.target).remove()
 })
 
-const updateCanvas = async () => {
-  const newParamBack = `${parameters['sides-opacity']}/${parameters['back-color']}/${parameters['back-file']}/${parameters['back-opacity']}/${parameters['back-font-color']}`
-
-  if (newParamBack === paramBack) return
-
-  paramBack = newParamBack
-
-  context.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-  context.globalCompositeOperation = 'destination-in'
-
-  cctx.clearRect(CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-
-  canvas.width = CANVAS_WIDTH
-  canvas.height = CANVAS_HEIGHT
-
-  const backgroundColor = parameters['back-color']
-
-  context.fillStyle = '#ffffff'
-  context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-
-  context.fillStyle = backgroundColor
-  context.fillRect(DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
-
-  if (backgroundColor !== '#ffffff') {
-    cctx.fillStyle = backgroundColor
-    cctx.fillRect(CANVAS_WIDTH + DX_F, DY_F, BACKGROUND_WIDTH_F, BACKGROUND_HEIGHT_F)
-  }
-
-  const backgroundImage = parameters['back-file']
-
-  if (backgroundImage) {
-    await loadImage(backgroundImage).then((image) => {
-      context.globalAlpha = parameters['back-opacity'] / 100
-      context.drawImage(image, DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
-      context.globalAlpha = 1
-
-      cctx.globalAlpha = parameters['back-opacity'] / 100
-      cctx.drawImage(image, CANVAS_WIDTH + DX_F, DY_F, BACKGROUND_WIDTH_F, BACKGROUND_HEIGHT_F)
-      cctx.globalAlpha = 1
-    })
-  }
-
-  const imageSources = [$('#stridePicDos')[0], $('#DessinDos')[0], $('#TextDos')[0]]
-
-  await Promise.all(imageSources.map((image, index) => {
-    if (index !== imageSources.length - 1) {
-      return loadImage(image)
-    } else {
-      return loadImage(image).then((image) => {
-        return filterImage(image, parameters['back-font-color'])
-      })
-    }
-  }))
-    .then((images) => {
-      images.forEach((image, index) => {
-
-        if (!index) {
-          context.globalAlpha = parameters['sides-opacity'] / 100
-          context.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-          context.globalAlpha = 1
-
-        } else {
-          context.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-        }
-      })
-    }).then(() => {
-      return loadTexture(canvas.toDataURL(), false)
-    }).catch((err) => {
-      console.error(err)
-    })
-
-  const imageSourcesSachet = [$('#DessinDosSachet')[0], $('#TextDosSachet')[0]]
-
-  await Promise.all(imageSourcesSachet.map((image, index) => {
-    if (index !== imageSourcesSachet.length - 1) {
-      return loadImage(image)
-    } else {
-      return loadImage(image).then((image) => {
-        return filterImage(image, parameters['back-font-color'])
-      })
-    }
-  }))
-    .then((images) => {
-      images.forEach((image, index) => {
-        cctx.drawImage(image, CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-      })
-    }).catch((err) => {
-      console.error(err)
-    })
-}
-
-// const LOGO_CENTER_X = 2217 (665), LOGO_CENTER_Y = 3000, LOGO_MAX_WIDTH = 3000, LOGO_MAX_HEIGHT = 4000
-
-const LOGO_CENTER_X = 665, LOGO_CENTER_Y = 900, LOGO_MAX_WIDTH = 950, LOGO_MAX_HEIGHT = 1200
-const CANVAS_WIDTH = 1330, CANVAS_HEIGHT = 2177
-const BORDER_WIDTH = 200, BORDER_HEIGHT = 200
-
-// const LOGO_CENTER_X = 1330, LOGO_CENTER_Y = 1800, LOGO_MAX_WIDTH = 1900, LOGO_MAX_HEIGHT = 2400
-// const CANVAS_WIDTH = 2660, CANVAS_HEIGHT = 4354
-// const BORDER_WIDTH = 400, BORDER_HEIGHT = 400
-
-const DX = BORDER_WIDTH, DY = BORDER_HEIGHT, BACKGROUND_WIDTH = CANVAS_WIDTH - (2 * BORDER_WIDTH),
-  BACKGROUND_HEIGHT = CANVAS_HEIGHT - (2 * BORDER_HEIGHT)
-const BORDER_WIDTH_F = 160, BORDER_HEIGHT_F = 175
-// const BORDER_WIDTH_F = 320, BORDER_HEIGHT_F = 350
-const DX_F = BORDER_WIDTH_F, DY_F = BORDER_HEIGHT_F, BACKGROUND_WIDTH_F = CANVAS_WIDTH - (2 * BORDER_WIDTH_F),
-  BACKGROUND_HEIGHT_F = CANVAS_HEIGHT - (2 * BORDER_HEIGHT_F)
-
-const cResult = document.createElement('canvas')
-const cctx = cResult.getContext('2d')
-cctx.globalCompositeOperation = 'source-over'
-cResult.width = CANVAS_WIDTH * 2
-cResult.height = CANVAS_HEIGHT
-
-const updateCanvasFront = async () => {
-  const newParamFront = `${parameters['logo-file']}/${parameters['sides-opacity']}/${parameters['face-color']}/${parameters['face-file']}/${parameters['face-opacity']}/${parameters['face-font-color']}`
-
-  if (newParamFront === paramFront) return
-
-  paramFront = newParamFront
-  contextFront.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-  contextFront.globalCompositeOperation = 'destination-in'
-
-  cctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-
-  canvasFront.width = CANVAS_WIDTH
-  canvasFront.height = CANVAS_HEIGHT
-
-  const backgroundColor = parameters['face-color']
-
-  contextFront.fillStyle = '#ffffff'
-  contextFront.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-
-  contextFront.fillStyle = backgroundColor
-  contextFront.fillRect(DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
-
-  if (backgroundColor !== '#ffffff') {
-    cctx.fillStyle = backgroundColor
-    cctx.fillRect(DX_F, DY_F, BACKGROUND_WIDTH_F, BACKGROUND_HEIGHT_F)
-  }
-
-  const backgroundImage = parameters['face-file']
-
-  if (backgroundImage) {
-    await loadImage(backgroundImage).then((image) => {
-      contextFront.globalAlpha = parameters['face-opacity'] / 100
-      contextFront.drawImage(image, DX, DY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT)
-      contextFront.globalAlpha = 1
-
-      cctx.globalAlpha = parameters['face-opacity'] / 100
-      cctx.drawImage(image, DX_F, DY_F, BACKGROUND_WIDTH_F, BACKGROUND_HEIGHT_F)
-      cctx.globalAlpha = 1
-    })
-  }
-
-  let logoImage = parameters['logo-file']
-
-  if (!logoImage && !backgroundImage) {
-    logoImage = $('#logoExample')[0] //'objects/logoExample.png'
-  }
-
-  const imageSources = [$('#stridePicFace')[0], $('#DessinFace')[0], $('#TextFace')[0]]
-
-  if (logoImage) {
-    imageSources.push(logoImage)
-  }
-
-  await Promise.all(imageSources.map((image, index) => {
-    const textImageIndex = imageSources.length - (logoImage ? 2 : 1)
-
-    if (index !== textImageIndex) {
-      return loadImage(image)
-    } else {
-      return loadImage(image).then((image) => {
-        return filterImage(image, parameters['face-font-color'])
-      })
-    }
-  }))
-    .then((images) => {
-      images.forEach((image, index) => {
-
-
-        if (!index) {
-          contextFront.globalAlpha = parameters['sides-opacity'] / 100
-          contextFront.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-          contextFront.globalAlpha = 1
-
-        } else if (index === images.length - 1 && logoImage) {
-          const wider = (image.width / LOGO_MAX_WIDTH) > (image.height / LOGO_MAX_HEIGHT)
-          let width, height
-          if (wider) {
-            width = LOGO_MAX_WIDTH
-            height = (LOGO_MAX_WIDTH / image.width) * image.height
-          } else {
-            width = (LOGO_MAX_HEIGHT / image.height) * image.width
-            height = LOGO_MAX_HEIGHT
-          }
-
-          const dx = LOGO_CENTER_X - (width / 2)
-          const dy = LOGO_CENTER_Y - (height / 2)
-
-          contextFront.drawImage(image, dx, dy, width, height)
-        } else {
-
-          contextFront.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-        }
-      })
-    }).then(() => {
-      return loadTexture(canvasFront.toDataURL(), true)
-    }).catch((err) => {
-      console.error(err)
-    })
-
-  const imageSourcesSachet = [$('#DessinFaceSachet')[0], $('#TextFaceSachet')[0]]
-
-  if (logoImage) {
-    imageSourcesSachet.push(logoImage)
-  }
-
-  await Promise.all(imageSourcesSachet.map((image, index) => {
-    const textImageIndex = imageSourcesSachet.length - (logoImage ? 2 : 1)
-
-    if (index !== textImageIndex) {
-      return loadImage(image)
-    } else {
-      return loadImage(image).then((image) => {
-        return filterImage(image, parameters['face-font-color'])
-      })
-    }
-  }))
-    .then((images) => {
-      images.forEach((image, index) => {
-
-        if (index === images.length - 1 && logoImage) {
-          const wider = (image.width / LOGO_MAX_WIDTH) > (image.height / LOGO_MAX_HEIGHT)
-          let width, height
-          if (wider) {
-            width = LOGO_MAX_WIDTH
-            height = (LOGO_MAX_WIDTH / image.width) * image.height
-          } else {
-            width = (LOGO_MAX_HEIGHT / image.height) * image.width
-            height = LOGO_MAX_HEIGHT
-          }
-
-          const dx = LOGO_CENTER_X - (width / 2)
-          const dy = LOGO_CENTER_Y - (height / 2)
-
-          cctx.drawImage(image, dx, dy, width, height)
-        } else {
-
-          cctx.drawImage(image, 0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
-        }
-      })
-    }).catch((err) => {
-      console.error(err)
-    })
-}
+const sachetGenerator = new SachetImageGenerator()
 
 let sachetHash = getUrlParameter('id')
 let sachetId = null
@@ -665,7 +345,6 @@ function showSachetId(sachetId) {
 $(window).on('load', async () => {
   await init()
 
-
   if (sachetHash) {
     try {
       await loadSachet(sachetHash)
@@ -677,14 +356,13 @@ $(window).on('load', async () => {
     }
   }
 
-  await updateCanvasFront()
-  await updateCanvas()
+  renderAllImages(parameters)
 
   $('.loader').fadeOut()
 })
 
 document.getElementById('download-front').addEventListener('click', function() {
-  this.href = cResult.toDataURL()
+  this.href = sachetGenerator.getResult()
   this.download = (sachetId ? sachetId : 'not-saved-sachet') + '.png'
 }, false)
 

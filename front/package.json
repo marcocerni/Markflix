@@ -12,6 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "file-saver": "^2.0.2",
+    "jszip": "^3.5.0",
     "three": "^0.115.0",
     "toastify-js": "^1.9.1"
   },

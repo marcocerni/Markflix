@@ -1,9 +1,14 @@
 import Toastify from 'toastify-js'
+import SachetImageGenerator, { loadFileAsText } from './SachetImageGenerator'
+import JSZip from 'jszip'
+import { saveAs } from 'file-saver'
 
 const loginUrl = `${backUrl}/auth/login`
 const postUrl = `${backUrl}/sachet/massive`
 const getAllSachetsUrl = `${backUrl}/sachet`
-let editor, csv
+let editor, csv, sachets
+
+const sachetGenerator = new SachetImageGenerator()
 
 $(document).ready(() => {
   ClassicEditor
@@ -96,9 +101,6 @@ $('#login-form').submit(function(e) {
 })
 
 document.getElementById('download-all').addEventListener('click', function() {
-// function(e) {
-//   e.preventDefault()
-
   const $button = $(this)
 
   const oldContent = $button.html()
@@ -118,8 +120,6 @@ document.getElementById('download-all').addEventListener('click', function() {
       const csvContent = sachets.map(sachet => Object.values(sachet).map(v => `"${v}"`).join(';')).join('\n')
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
 
-      console.log(blob)
-
       var link = document.createElement('a')
       link.href = URL.createObjectURL(blob)
       link.download = 'sachets.csv'
@@ -131,47 +131,20 @@ document.getElementById('download-all').addEventListener('click', function() {
         duration: 3000,
         backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
       }).showToast()
-
-      console.error(error)
       $button.html(oldContent)
       $button.prop('disabled', false)
     },
   })
 }, false)
 
-function loadFile(file) {
-  return new Promise((resolve, reject) => {
-    let fr = new FileReader()
-    fr.onload = () => {
-      resolve(fr.result)
-    }
-    fr.onerror = (err) => {
-      reject(err)
-    }
-    fr.readAsText(file)
-  })
-}
-
 let fileName
 
 $(document).on('change', '#csv-file', (e) => {
   if (e.target.files && e.target.files.length) {
-    // parameters[e.target.name] = e.target.files[0];
-
     fileName = e.target.files[0].name
     $(e.target).next('label').html(fileName)
 
-
-    loadFile(e.target.files[0]).then((fileString) => {
-      // const lines = fileString.split('\n').filter(line => line.length > 5)
-      //
-      // csv = lines.map(line => {
-      //   const [firstField, firstRemaining] = line.split(/;(.+)/)
-      //   const [secondField, thirdField] = firstRemaining.split(/;(.+)/)
-      //
-      //   return [firstField, secondField, thirdField]
-      // })
-
+    loadFileAsText(e.target.files[0]).then((fileString) => {
       fileString = fileString.replace(/;base64/g, '!base64!')
 
       csv = CSVToArray(fileString, ';').filter(line => line.length > 1).map((line) => {
@@ -229,6 +202,27 @@ document.getElementById('download-rows').addEventListener('click', function() {
   this.download = fileName ? fileName : 'output.csv'
 }, false)
 
+document.getElementById('download-images').addEventListener('click', function() {
+  const $button = $('#download-images');
+  const oldContent = $button.html()
+  $button.html(oldContent + ' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
+  $button.prop('disabled', true)
+
+  downloadSachetsAsZip(sachets).then(() => {
+    $button.html(oldContent)
+    $button.prop('disabled', false)
+  }).catch((e) => {
+    console.log(e);
+    Toastify({
+      text: e.message,
+      duration: 3000,
+      backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
+    }).showToast()
+    $button.html(oldContent)
+    $button.prop('disabled', false)
+  })
+}, false)
+
 $(document).on('click', '#send-emails, #save-sachets', async (e) => {
   e.preventDefault()
 
@@ -253,6 +247,7 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
   $('.errors-container').slideUp()
 
   const sachetChunks = chunkArrayInGroups(csvFiltered, 100)
+  const sachetResult = []
 
   const errors = []
   sachetChunks.reduce((current, sachetChunk, indexChunk) => {
@@ -271,7 +266,7 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
       }).then((response) => {
 
         response.sachets.forEach((sachet, index) => {
-          const rowNumber = selectedRows[index+(indexChunk*100)]
+          const rowNumber = selectedRows[index + (indexChunk * 100)]
           const tds = $($('.csv-content tr').get(rowNumber)).find('td')
 
           tds[tds.length - 2].innerHTML = sachet.id
@@ -292,11 +287,12 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
         }
 
         Toastify({
-          text: `Batch ${indexChunk+1}/${sachetChunks.length} processed`,
+          text: `Batch ${indexChunk + 1}/${sachetChunks.length} processed`,
           duration: 3000,
           backgroundColor: 'linear-gradient(to right, rgb(0, 176, 155), rgb(150, 201, 61))',
         }).showToast()
 
+        sachetResult.push(...response.sachets)
       }).catch((error) => {
         errors.push(error)
       })
@@ -311,7 +307,9 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
     $button.html(oldContent)
     $button.prop('disabled', false)
 
-    console.log(errors)
+    sachets = sachetResult
+
+    $('#download-images').prop('disabled', !sachets.length)
   })
 
   return false
@@ -353,6 +351,26 @@ $(document).on('change', '.check-all', function(event) {
     return parseInt($(element).data('index'))
   })
 })
+
+/* ZIP File */
+async function downloadSachetsAsZip(sachets) {
+  const zip = new JSZip()
+  const img = zip.folder('images')
+
+  for (const sachet of sachets) {
+    await sachetGenerator.generatePrintImage(SachetImageGenerator.getDefaultParameters(sachet.logo))
+
+    const dataUrl = sachetGenerator.getResult().split(',')[1]
+
+    img.file(`${sachet.id}.png`, dataUrl, { base64: true })
+  }
+
+  zip.generateAsync({ type: 'blob' }).then(content => {
+    saveAs(content, `sachet_images.zip`)
+  })
+}
+
+/* ZIP File */
 
 /* CSV Parsing */
 function CSVToArray(strData, strDelimiter) {
