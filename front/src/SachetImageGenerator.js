@@ -316,7 +316,7 @@ export default class SachetImageGenerator {
       }
     }))
       .then((images) => {
-        images.forEach((image, index) => {
+        images.forEach((image) => {
           this.cctx.drawImage(image, CANVAS_WIDTH, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
         })
       }).catch((err) => {

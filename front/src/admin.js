@@ -203,7 +203,7 @@ document.getElementById('download-rows').addEventListener('click', function() {
 }, false)
 
 document.getElementById('download-images').addEventListener('click', function() {
-  const $button = $('#download-images');
+  const $button = $('#download-images')
   const oldContent = $button.html()
   $button.html(oldContent + ' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
   $button.prop('disabled', true)
@@ -212,7 +212,7 @@ document.getElementById('download-images').addEventListener('click', function() 
     $button.html(oldContent)
     $button.prop('disabled', false)
   }).catch((e) => {
-    console.log(e);
+    console.log(e)
     Toastify({
       text: e.message,
       duration: 3000,
@@ -241,7 +241,6 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
   const oldContent = $button.html()
   $button.html(oldContent + ' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
   $button.prop('disabled', true)
-
 
   $('.errors-container ul').html('')
   $('.errors-container').slideUp()
@@ -277,7 +276,7 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
 
         if (response.errors.length) {
           const html = response.errors.reduce((html, error) => {
-            return html + `<li>${error.i}: ${error.errors}</li>`
+            return html + `<li>${error.i + (indexChunk * 100)}: ${error.errors}</li>`
           }, '')
 
           $('.errors-container ul').append(html)
@@ -354,20 +353,46 @@ $(document).on('change', '.check-all', function(event) {
 
 /* ZIP File */
 async function downloadSachetsAsZip(sachets) {
-  const zip = new JSZip()
-  const img = zip.folder('images')
 
-  for (const sachet of sachets) {
-    await sachetGenerator.generatePrintImage(SachetImageGenerator.getDefaultParameters(sachet.logo))
+  const sachetChunks = chunkArrayInGroups(sachets.filter(s => s && s.id && s.logo && !s.logo.startsWith('http')), 100)
+  let processedLine = 0, processedChunk = 0
 
-    const dataUrl = sachetGenerator.getResult().split(',')[1]
+  for (const sachets of sachetChunks) {
+    const zip = new JSZip()
+    const img = zip.folder('images')
+    processedChunk++
 
-    img.file(`${sachet.id}.png`, dataUrl, { base64: true })
+    for (const sachet of sachets) {
+      processedLine++
+
+      try {
+        await sachetGenerator.generatePrintImage(SachetImageGenerator.getDefaultParameters(sachet.logo))
+
+        const dataUrl = sachetGenerator.getResult().split(',')[1]
+
+        img.file(`${sachet.id}.png`, dataUrl, { base64: true })
+      } catch (e) {
+        console.error(processedLine, sachet.logo, e)
+      }
+    }
+
+    const content = await zip.generateAsync({ type: 'blob' })
+    saveAs(content, `sachet_images_${processedChunk}.zip`)
+
+    Toastify({
+      text: `Processed ${processedLine} images`,
+      duration: 3000,
+      backgroundColor: 'linear-gradient(to right, rgb(0, 176, 155), rgb(150, 201, 61))',
+    }).showToast()
   }
 
-  zip.generateAsync({ type: 'blob' }).then(content => {
-    saveAs(content, `sachet_images.zip`)
-  })
+  Toastify({
+    text: `Finished generating ${processedLine} images`,
+    duration: 3000,
+    backgroundColor: 'linear-gradient(to right, rgb(0, 176, 155), rgb(150, 201, 61))',
+  }).showToast()
+
+
 }
 
 /* ZIP File */

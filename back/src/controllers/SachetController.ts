@@ -222,7 +222,7 @@ class SachetController {
       const sachet = new Sachet()
 
       sachet.logo = line[2]
-      sachet.email = line[0]
+      sachet.email = line[0].trim()
       sachet.opacity = 50
       sachet.backBackgroundColor = '#ffffff'
       sachet.backBackgroundOpacity = 100
