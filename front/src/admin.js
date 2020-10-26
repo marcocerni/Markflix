@@ -139,6 +139,37 @@ document.getElementById('download-all').addEventListener('click', function() {
 
 let fileName
 
+if (typeof String.prototype.endsWith !== 'function') {
+  String.prototype.endsWith = function(suffix) {
+    return this.indexOf(suffix, this.length - suffix.length) !== -1;
+  };
+}
+
+$(document).on('click', '#filter-rows', (e) => {
+  const extensionsText = $('#email-extensions').val()
+  const extensions = extensionsText ? extensionsText.split(',') : []
+
+  if (!extensions.length)
+    return
+
+  let count = 0
+  $('.csv-content tr').each((i, e) => {
+    const email = $(e).find('td:nth-child(3)').html();
+    const hasExtensions = extensions.some(extension => email.endsWith(extension))
+
+    $(e).find('.check-row').prop('checked', !hasExtensions)
+
+    if (!hasExtensions)
+      count++
+  })
+
+  updateCsvLines(count)
+});
+
+function updateCsvLines(filteredLines) {
+  $('.lines-detail').html(`(${filteredLines} de ${csv.length})`)
+}
+
 $(document).on('change', '#csv-file', (e) => {
   if (e.target.files && e.target.files.length) {
     fileName = e.target.files[0].name
@@ -147,11 +178,14 @@ $(document).on('change', '#csv-file', (e) => {
     loadFileAsText(e.target.files[0]).then((fileString) => {
       fileString = fileString.replace(/;base64/g, '!base64!')
 
-      csv = CSVToArray(fileString, ';').filter(line => line.length > 1).map((line) => {
+      csv = CSVToArray(fileString, ';').filter(line => line.length > 1 && line[2].includes('base64')).map((line) => {
         line[2] = line[2].replace(/!base64!/g, ';base64')
 
         return line
       })
+
+      $('#email-extensions').html('')
+      updateCsvLines(csv.length)
 
       const html = csv.reduce((html, line, index) => {
 

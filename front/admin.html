@@ -133,34 +133,6 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="lead">💿 File content</label>
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <th scope="col">
-                                <div class="form-group form-check"><input type="checkbox"
-                                                                          class="form-check-input check-all" checked>
-                                </div>
-                            </th>
-                            <th scope="col">#</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Url</th>
-                            <th scope="col">Logo</th>
-                            <th scope="col">Generated ID</th>
-                            <th scope="col">Generated Link</th>
-                        </tr>
-                        </thead>
-                        <tbody class="csv-content">
-                        <tr>
-                            <td colspan="7"><p class="text-center">No content loaded yet 😟</p></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
             <div class="text-center">
                 <div class="btn-group" role="group" aria-label="Basic example">
                     <a class="btn btn-lg btn-dark" type="button" id="download-all">Tous les Sachets 📦</a>
@@ -187,6 +159,51 @@
                     <ul>
 
                     </ul>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="lead">💿 File content <span class="lines-detail"></span></label>
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th scope="col">
+                                <div class="form-group form-check">
+                                    <input type="checkbox" class="form-check-input check-all" checked />
+                                </div>
+                            </th>
+                            <th scope="col">#</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Url</th>
+                            <th scope="col">Logo</th>
+                            <th scope="col">Generated ID</th>
+                            <th scope="col">Generated Link</th>
+                        </tr>
+                        <tr>
+                            <th scope="col" colspan="2">
+                                <h4><span class="badge badge-pill badge-primary">Filter</span></h4>
+                            </th>
+                            <th scope="col">
+                                <input type="text"
+                                       class="form-control"
+                                       placeholder="Par example 'gouv.fr,.us,.pl'"
+                                       id="email-extensions" />
+                            </th>
+                            <th scope="col"></th>
+                            <th scope="col" colspan="3" class="text-right">
+                                <button class="btn btn-primary" type="button" id="filter-rows">
+                                    Filtrer
+                                </button>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody class="csv-content">
+                        <tr>
+                            <td colspan="7"><p class="text-center">No content loaded yet 😟</p></td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
