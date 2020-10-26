@@ -3,7 +3,8 @@ const path = require('path')
 module.exports = {
   entry: {
     app: './src/index.js',
-    admin: './src/admin.js'
+    admin: './src/admin.js',
+    unsubscribe: './src/unsubscribe.js',
   },
   output: {
     path: path.resolve(__dirname, 'public'),

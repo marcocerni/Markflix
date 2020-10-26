@@ -2,10 +2,13 @@ import config from '../config/config'
 import { Sachet } from '../entity/Sachet'
 import { ImageService } from './ImageService'
 import * as nodemailer from 'nodemailer'
+import { getRepository } from 'typeorm'
+import { UnsubscribedEmail } from '../entity/UnsubscribedEmail'
 
 export class EmailService {
   private transporter: any
   private transporterMassive: any
+  private unsubscribedEmails: string[]
 
   constructor() {
     this.transporter = nodemailer.createTransport({
@@ -23,9 +26,21 @@ export class EmailService {
         pass: config.emailMassive.password,
       },
     })
+
+    this.unsubscribedEmails = []
+  }
+
+  async init() {
+    const emailRepository = getRepository(UnsubscribedEmail)
+
+    this.unsubscribedEmails = (await emailRepository.find()).map(unsubscribedEmail => unsubscribedEmail.email)
   }
 
   sendMail(toEmail: string, subject: string, body: string, logo?: Buffer, massive = true): Promise<object> {
+
+    if (this.unsubscribedEmails.includes(toEmail)) {
+      throw new Error(`Email unsubscribed: ${toEmail}`)
+    }
 
     let attachments = []
 
@@ -37,7 +52,7 @@ export class EmailService {
       }]
     }
 
-    const transporter = massive ? this.transporterMassive : this.transporter;
+    const transporter = massive ? this.transporterMassive : this.transporter
 
     return transporter.sendMail({
       from: massive ? config.emailMassive.fromUser : config.email.fromUser,
@@ -117,6 +132,10 @@ export class EmailService {
 
       logo = await ImageService.createSachetImage(sachet.logo)
     }
+
+    const unsubscribeLink = `${config.host}/unsubscribe.html?id=${sachet.hashedId}`
+
+    body += `<div style="text-align: center; color: #333333;"><a href="${unsubscribeLink}">Se désinscrire</a></div>`
 
     return this.sendMail(sachet.email, subject, body, logo, massive)
   }

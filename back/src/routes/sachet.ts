@@ -45,5 +45,7 @@ router.post(
   SachetController.massiveSend,
 )
 
+router.post('/unsubscribe/:id', SachetController.unsubscribeSachet)
+
 
 export default router

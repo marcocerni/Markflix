@@ -6,6 +6,7 @@ import { ImageService } from '../services/ImageService'
 import { EmailService } from '../services/MailService'
 import config from '../config/config'
 import * as https from 'https'
+import { UnsubscribedEmail } from '../entity/UnsubscribedEmail'
 
 const Hashids = require('hashids/cjs')
 const validUrl = require('valid-url')
@@ -126,6 +127,8 @@ class SachetController {
 
     const emailService = new EmailService()
 
+    await emailService.init()
+
     await Promise.all([
       emailService.sendNewSachetCreatedEmail(sachet, false),
       emailService.sendNewSachetCreatedEmailClient(sachet, undefined, undefined, false),
@@ -213,6 +216,30 @@ class SachetController {
     }
   }
 
+  static unsubscribeSachet = async (req: Request, res: Response) => {
+    const id = hashids.decode(req.params.id)[0] as number
+
+    const sachetRepository = getRepository(Sachet)
+    let sachet
+    try {
+      sachet = await sachetRepository.findOneOrFail(id)
+    } catch (error) {
+      return res.status(404).send('Sachet not found')
+    }
+
+    try {
+      const unsubscribedEmail = new UnsubscribedEmail(sachet.email)
+
+      const emailRepository = getRepository(UnsubscribedEmail)
+
+      await emailRepository.save(unsubscribedEmail)
+    } catch (error) {
+      return res.status(404).send('Email not unsubscribed')
+    }
+
+    return res.status(200).send('Email désabonné')
+  }
+
   static massiveSend = async (req: Request, res: Response) => {
     const { content, csv, sendEmails } = req.body
 
@@ -255,6 +282,8 @@ class SachetController {
     if (sendEmails === 'true') {
       console.time('entro email')
       const emailService = new EmailService()
+
+      await emailService.init()
 
       await Promise.all(sachets.map((sachet: Sachet, index) => {
         return emailService.sendNewSachetCreatedEmailClient(sachet, content, `Votre sachet de gel hydroalcoolique monodose personnalisé`)
