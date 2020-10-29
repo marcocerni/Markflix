@@ -48,7 +48,7 @@ export class EmailService {
 
       const sachet = await sachetRepository.findOne({where: {email: toEmail}});
 
-      if (sachet) {
+      if (massive && sachet) {
         throw new Error(`Email already in the database: ${toEmail}`)
       }
     } catch (e) {
