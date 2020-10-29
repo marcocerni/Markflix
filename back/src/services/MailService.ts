@@ -9,6 +9,7 @@ export class EmailService {
   private transporter: any
   private transporterMassive: any
   private unsubscribedEmails: string[]
+  private previousEmails: string[]
 
   constructor() {
     this.transporter = nodemailer.createTransport({
@@ -28,18 +29,25 @@ export class EmailService {
     })
 
     this.unsubscribedEmails = []
+    this.previousEmails = []
   }
 
   async init() {
     const emailRepository = getRepository(UnsubscribedEmail)
+    const sachetRepository = getRepository(Sachet)
 
-    this.unsubscribedEmails = (await emailRepository.find()).map(unsubscribedEmail => unsubscribedEmail.email)
+    this.unsubscribedEmails = (await emailRepository.find()).map(unsubscribedEmail => unsubscribedEmail.email.toLowerCase())
+    this.previousEmails = [...new Set((await sachetRepository.find()).map(sachet => sachet.email.toLowerCase()))]
   }
 
   sendMail(toEmail: string, subject: string, body: string, logo?: Buffer, massive = true): Promise<object> {
 
-    if (this.unsubscribedEmails.includes(toEmail)) {
+    if (this.unsubscribedEmails.includes(toEmail.toLowerCase())) {
       throw new Error(`Email unsubscribed: ${toEmail}`)
+    }
+
+    if (this.previousEmails.includes(toEmail.toLowerCase())) {
+      throw new Error(`Email already in the database: ${toEmail}`)
     }
 
     let attachments = []
