@@ -141,8 +141,8 @@ let fileName
 
 if (typeof String.prototype.endsWith !== 'function') {
   String.prototype.endsWith = function(suffix) {
-    return this.indexOf(suffix, this.length - suffix.length) !== -1;
-  };
+    return this.indexOf(suffix, this.length - suffix.length) !== -1
+  }
 }
 
 $(document).on('click', '#filter-rows', (e) => {
@@ -154,17 +154,20 @@ $(document).on('click', '#filter-rows', (e) => {
 
   let count = 0
   $('.csv-content tr').each((i, e) => {
-    const email = $(e).find('td:nth-child(3)').html();
+    const email = $(e).find('td:nth-child(3)').html()
     const hasExtensions = extensions.some(extension => email.endsWith(extension))
 
-    $(e).find('.check-row').prop('checked', !hasExtensions)
+    const check = $(e).find('.check-row')
+    if (check.prop('checked')) {
+      check.prop('checked', !hasExtensions)
+    }
 
     if (!hasExtensions)
       count++
   })
 
   updateCsvLines(count)
-});
+})
 
 function updateCsvLines(filteredLines) {
   $('.lines-detail').html(`(${filteredLines} de ${csv.length})`)
