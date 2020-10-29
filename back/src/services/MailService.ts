@@ -29,25 +29,30 @@ export class EmailService {
     })
 
     this.unsubscribedEmails = []
-    this.previousEmails = []
   }
 
   async init() {
     const emailRepository = getRepository(UnsubscribedEmail)
-    const sachetRepository = getRepository(Sachet)
 
     this.unsubscribedEmails = (await emailRepository.find()).map(unsubscribedEmail => unsubscribedEmail.email.toLowerCase())
-    this.previousEmails = [...new Set((await sachetRepository.find()).map(sachet => sachet.email.toLowerCase()))]
   }
 
-  sendMail(toEmail: string, subject: string, body: string, logo?: Buffer, massive = true): Promise<object> {
+  async sendMail(toEmail: string, subject: string, body: string, logo?: Buffer, massive = true): Promise<object> {
 
     if (this.unsubscribedEmails.includes(toEmail.toLowerCase())) {
       throw new Error(`Email unsubscribed: ${toEmail}`)
     }
 
-    if (this.previousEmails.includes(toEmail.toLowerCase())) {
-      throw new Error(`Email already in the database: ${toEmail}`)
+    try {
+      const sachetRepository = getRepository(Sachet)
+
+      const sachet = await sachetRepository.findOne({where: {email: toEmail}});
+
+      if (sachet) {
+        throw new Error(`Email already in the database: ${toEmail}`)
+      }
+    } catch (e) {
+
     }
 
     let attachments = []
@@ -71,7 +76,7 @@ export class EmailService {
     })
   }
 
-  sendNewSachetCreatedEmail(sachet: Sachet, massive = true) {
+  async sendNewSachetCreatedEmail(sachet: Sachet, massive = true) {
     const subject = 'GEL + FRANCE - Nouveau sachet créé'
 
     const linkHtml = `<table width="100%" border="0" cellspacing="0" cellpadding="0">
