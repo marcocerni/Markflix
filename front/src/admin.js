@@ -434,6 +434,12 @@ async function downloadSachetsAsZip(sachets) {
 
 /* ZIP File */
 
+$('.form-blacklist').submit((e) => {
+  e.preventDefault()
+
+
+})
+
 /* CSV Parsing */
 function CSVToArray(strData, strDelimiter) {
   // Check to see if the delimiter is defined. If not,

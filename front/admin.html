@@ -113,99 +113,167 @@
 </form>
 
 <div class="csv-container container">
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="mailing-tab" data-toggle="tab" href="#mailing" role="tab"
+               aria-controls="mailing" aria-selected="true">Mailing</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="blacklist-tab" data-toggle="tab" href="#blacklist" role="tab"
+               aria-controls="blacklist" aria-selected="false">Blacklist</a>
+        </li>
+    </ul>
     <div class="card">
         <div class="card-body">
 
-            <div class="form-group">
-                <label class="lead">✉️ Email content</label>
-                <div id="editor"></div>
-            </div>
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="mailing" role="tabpanel" aria-labelledby="mailing-tab">
+
+                    <div class="form-group">
+                        <label class="lead">✉️ Email content</label>
+                        <div id="editor"></div>
+                    </div>
 
 
-            <div class="form-group">
-                <label for="csv-file" class="lead"> 📁 Fichier CSV</label>
-                <div class="input-group">
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="csv-file" name="csv-file"
-                               aria-describedby="logo-file" accept=".csv,.txt">
-                        <label class="custom-file-label" for="csv-file"></label>
+                    <div class="form-group">
+                        <label for="csv-file" class="lead"> 📁 Fichier CSV</label>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="csv-file" name="csv-file"
+                                       aria-describedby="logo-file" accept=".csv,.txt">
+                                <label class="custom-file-label" for="csv-file"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <a class="btn btn-lg btn-dark" type="button" id="download-all">Tous les Sachets 📦</a>
+                            <a class="btn btn-lg btn-secondary" type="button" disabled="disabled" id="download-rows">Télécharger
+                                CSV
+                                💾</a>
+                            <button class="btn btn-lg btn-warning" type="button" disabled="disabled" id="save-sachets">
+                                Générer
+                                Sachets 🏄
+                            </button>
+                            <button class="btn btn-lg btn-primary" type="button" disabled="disabled" id="send-emails">
+                                Envoyer mails
+                                🛫
+                            </button>
+                            <button class="btn btn-lg btn-primary" type="button" disabled="disabled"
+                                    id="download-images">
+                                Télécharger Images
+                                🛹
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="errors-container">
+                        <div class="alert alert-warning mt-2" role="alert"><h3>Erreurs de ligne</h3>
+                            <ul>
+
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="lead">💿 File content <span class="lines-detail"></span></label>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th scope="col">
+                                        <div class="form-group form-check">
+                                            <input type="checkbox" class="form-check-input check-all" checked/>
+                                        </div>
+                                    </th>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Url</th>
+                                    <th scope="col">Logo</th>
+                                    <th scope="col">Generated ID</th>
+                                    <th scope="col">Generated Link</th>
+                                </tr>
+                                <tr>
+                                    <th scope="col" colspan="2">
+                                        <!--                                <h4><span class="badge badge-pill badge-primary">Filter</span></h4>-->
+                                    </th>
+                                    <th scope="col">
+                                        <input type="text"
+                                               class="form-control"
+                                               placeholder="Par example 'gouv.fr,.us,.pl'"
+                                               id="email-extensions"/>
+                                    </th>
+                                    <th scope="col"></th>
+                                    <th scope="col" colspan="3" class="text-right">
+                                        <button class="btn btn-primary" type="button" id="filter-rows">
+                                            Filtrer
+                                        </button>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody class="csv-content">
+                                <tr>
+                                    <td colspan="7"><p class="text-center">No content loaded yet 😟</p></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="text-center">
-                <div class="btn-group" role="group" aria-label="Basic example">
-                    <a class="btn btn-lg btn-dark" type="button" id="download-all">Tous les Sachets 📦</a>
-                    <a class="btn btn-lg btn-secondary" type="button" disabled="disabled" id="download-rows">Télécharger
-                        CSV
-                        💾</a>
-                    <button class="btn btn-lg btn-warning" type="button" disabled="disabled" id="save-sachets">
-                        Générer
-                        Sachets 🏄
-                    </button>
-                    <button class="btn btn-lg btn-primary" type="button" disabled="disabled" id="send-emails">
-                        Envoyer mails
-                        🛫
-                    </button>
-                    <button class="btn btn-lg btn-primary" type="button" disabled="disabled" id="download-images">
-                        Télécharger Images
-                        🛹
-                    </button>
+
+                <div class="tab-pane fade show active" id="blacklist" role="tabpanel" aria-labelledby="blacklist-tab">
+
+                    <div class="form-group">
+                        <label for="csv-file" class="lead">📁 Fichier</label>
+                        <div class="input-group">
+                            <div class="custom-file">
+                                <input type="file" class="custom-file-input" id="mails-file" name="csv-mails"
+                                       accept=".csv,.txt">
+                                <label class="custom-file-label" for="mails-file"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="lead">💿 Emails <span class="lines-detail-blacklist"></span></label>
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th scope="col">#</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Date</th>
+                                </tr>
+                                </thead>
+                                <tbody class="blacklist-content">
+                                <tr>
+                                    <form id="form-blacklist">
+                                        <td></td>
+                                        <td><input type="email"
+                                                   class="form-control"
+                                                   name="email"
+                                                   placeholder=""
+                                                   required/>
+                                        </td>
+                                        <td>
+                                            <button class="btn btn-primary" type="submit">
+                                                Ajouter
+                                            </button>
+                                        </td>
+                                    </form>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+
                 </div>
+
             </div>
 
-            <div class="errors-container">
-                <div class="alert alert-warning mt-2" role="alert"><h3>Erreurs de ligne</h3>
-                    <ul>
-
-                    </ul>
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label class="lead">💿 File content <span class="lines-detail"></span></label>
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <th scope="col">
-                                <div class="form-group form-check">
-                                    <input type="checkbox" class="form-check-input check-all" checked />
-                                </div>
-                            </th>
-                            <th scope="col">#</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">Url</th>
-                            <th scope="col">Logo</th>
-                            <th scope="col">Generated ID</th>
-                            <th scope="col">Generated Link</th>
-                        </tr>
-                        <tr>
-                            <th scope="col" colspan="2">
-<!--                                <h4><span class="badge badge-pill badge-primary">Filter</span></h4>-->
-                            </th>
-                            <th scope="col">
-                                <input type="text"
-                                       class="form-control"
-                                       placeholder="Par example 'gouv.fr,.us,.pl'"
-                                       id="email-extensions" />
-                            </th>
-                            <th scope="col"></th>
-                            <th scope="col" colspan="3" class="text-right">
-                                <button class="btn btn-primary" type="button" id="filter-rows">
-                                    Filtrer
-                                </button>
-                            </th>
-                        </tr>
-                        </thead>
-                        <tbody class="csv-content">
-                        <tr>
-                            <td colspan="7"><p class="text-center">No content loaded yet 😟</p></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
         </div>
     </div>
 </div>
