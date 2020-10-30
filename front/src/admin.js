@@ -6,6 +6,7 @@ import { saveAs } from 'file-saver'
 const loginUrl = `${backUrl}/auth/login`
 const postUrl = `${backUrl}/sachet/massive`
 const getAllSachetsUrl = `${backUrl}/sachet`
+const getAllUnsubscribedEmailsUrl = `${backUrl}/sachet/unsubscribe`
 let editor, csv, sachets
 
 const sachetGenerator = new SachetImageGenerator()
@@ -79,6 +80,8 @@ $('#login-form').submit(function(e) {
 
       window.localStorage.setItem('session', jwt)
 
+      getUnsubscribedEmails()
+
       $('#login-form').slideUp(function() {
         $('.csv-container').slideDown()
       })
@@ -136,6 +139,83 @@ document.getElementById('download-all').addEventListener('click', function() {
     },
   })
 }, false)
+
+
+function getUnsubscribedEmails() {
+  $.ajax({
+    url: getAllUnsubscribedEmailsUrl,
+    type: 'GET',
+    headers: {
+      'Authorization': `Bearer ${window.localStorage.getItem('session')}`,
+    },
+    success: (unsubscribedEmails) => {
+      $('.lines-detail-blacklist').html(unsubscribedEmails.length)
+
+      const html = unsubscribedEmails.reduce((html, unsubscribedEmail, index) => {
+
+        html += `<tr>
+            <td>${index + 1}</td>
+            <td>${unsubscribedEmail.email}</td>
+            <td>${new Date(unsubscribedEmail.createdAt).toLocaleString()}</td>
+        </tr>`
+
+        return html
+      }, '')
+
+      $('.blacklist-content').html(html)
+    },
+    error: (error) => {
+      Toastify({
+        text: error.statusText,
+        duration: 3000,
+        backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
+      }).showToast()
+    },
+  })
+}
+
+function saveUnsubscribedEmails(emails) {
+  return new Promise((resolve, reject) => {
+
+    $.ajax({
+      url: getAllUnsubscribedEmailsUrl,
+      type: 'POST',
+      data: {
+        emails: emails,
+      },
+      headers: {
+        'Authorization': `Bearer ${window.localStorage.getItem('session')}`,
+      },
+      success: (newUnsubscribedEmails) => {
+        const numberOfLines = parseInt($('.lines-detail-blacklist').html()) + newUnsubscribedEmails.length
+        $('.lines-detail-blacklist').html(numberOfLines)
+
+        const html = newUnsubscribedEmails.reduce((html, unsubscribedEmail, index) => {
+
+          html += `<tr>
+            <td>${index + 1}</td>
+            <td>${unsubscribedEmail.email}</td>
+            <td>${new Date(unsubscribedEmail.createdAt).toLocaleString()}</td>
+        </tr>`
+
+          return html
+        }, '')
+
+        $('.blacklist-content').html(html + $('.blacklist-content').html())
+
+        resolve(newUnsubscribedEmails)
+      },
+      error: (error) => {
+        Toastify({
+          text: error.statusText,
+          duration: 3000,
+          backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
+        }).showToast()
+        reject(error)
+      },
+    })
+  })
+}
 
 let fileName
 
@@ -434,10 +514,35 @@ async function downloadSachetsAsZip(sachets) {
 
 /* ZIP File */
 
-$('.form-blacklist').submit((e) => {
+$('.form-blacklist [name="csv-mails"]').change((e) => {
+  const fileName = e.target.files[0].name
+  $(e.target).next('label').html(fileName)
+})
+
+$('.form-blacklist').submit(async function(e) {
   e.preventDefault()
 
+  let mails
 
+  const $csvMails = $(this).find('[name="csv-mails"]')
+  const $email = $(this).find('[name="email"]')
+
+  if ($csvMails.length) {
+    const csvInput = $csvMails[0]
+
+    const fileString = await loadFileAsText(csvInput.files[0])
+
+    csv = CSVToArray(fileString, ';')
+
+    mails = csv.map(line => line[0])
+  } else {
+    mails = [$email.val()]
+  }
+
+  await saveUnsubscribedEmails(mails)
+
+  $email.val('')
+  $csvMails.val('')
 })
 
 /* CSV Parsing */
@@ -474,7 +579,6 @@ function CSVToArray(strData, strDelimiter) {
   // Keep looping over the regular expression matches
   // until we can no longer find a match.
   while (arrMatches = objPattern.exec(strData)) {
-
     // Get the delimiter that was found.
     var strMatchedDelimiter = arrMatches[1]
 
@@ -508,12 +612,9 @@ function CSVToArray(strData, strDelimiter) {
       )
 
     } else {
-
       // We found a non-quoted value.
       strMatchedValue = arrMatches[3]
-
     }
-
 
     // Now that we have our value string, let's add
     // it to the data array.

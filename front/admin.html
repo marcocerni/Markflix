@@ -223,33 +223,37 @@
                 </div>
 
 
-                <div class="tab-pane fade show active" id="blacklist" role="tabpanel" aria-labelledby="blacklist-tab">
+                <div class="tab-pane fade" id="blacklist" role="tabpanel" aria-labelledby="blacklist-tab">
 
-                    <div class="form-group">
-                        <label for="csv-file" class="lead">📁 Fichier</label>
-                        <div class="input-group">
-                            <div class="custom-file">
-                                <input type="file" class="custom-file-input" id="mails-file" name="csv-mails"
-                                       accept=".csv,.txt">
-                                <label class="custom-file-label" for="mails-file"></label>
+                    <form class="form-blacklist">
+                        <div class="form-group">
+                            <label for="mails-file" class="lead">📁 Fichier</label>
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input type="file" class="custom-file-input" id="mails-file" name="csv-mails"
+                                           accept=".csv,.txt" required>
+                                    <label class="custom-file-label" for="mails-file"></label>
+                                </div>
                             </div>
                         </div>
-                    </div>
+
+                        <button class="btn btn-primary" type="submit">
+                            Ajouter
+                        </button>
+                    </form>
 
                     <div class="form-group">
                         <label class="lead">💿 Emails <span class="lines-detail-blacklist"></span></label>
-                        <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
-                                <tr>
-                                    <th scope="col">#</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Date</th>
-                                </tr>
-                                </thead>
-                                <tbody class="blacklist-content">
-                                <tr>
-                                    <form id="form-blacklist">
+                        <form class="form-blacklist">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Date</th>
+                                    </tr>
+                                    <tr>
                                         <td></td>
                                         <td><input type="email"
                                                    class="form-control"
@@ -262,13 +266,14 @@
                                                 Ajouter
                                             </button>
                                         </td>
-                                    </form>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="blacklist-content">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
                     </div>
-
 
                 </div>
 

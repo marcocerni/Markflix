@@ -9,7 +9,6 @@ export class EmailService {
   private transporter: any
   private transporterMassive: any
   private unsubscribedEmails: string[]
-  private previousEmails: string[]
 
   constructor() {
     this.transporter = nodemailer.createTransport({

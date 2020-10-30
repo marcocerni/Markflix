@@ -8,6 +8,8 @@ const router = Router()
 
 router.get('/', [checkJwt, checkRole(['ADMIN'])], SachetController.listAll)
 
+router.get('/unsubscribe', [checkJwt, checkRole(['ADMIN'])], SachetController.getUnsubscribedEmails)
+
 router.get(
   '/:id',
   [],
@@ -45,7 +47,8 @@ router.post(
   SachetController.massiveSend,
 )
 
-router.post('/unsubscribe/:id', SachetController.unsubscribeSachet)
+router.post('/unsubscribe', [checkJwt, checkRole(['ADMIN'])], SachetController.unsubscribeEmails)
 
+router.post('/unsubscribe/:id', SachetController.unsubscribeSachet)
 
 export default router

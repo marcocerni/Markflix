@@ -45,6 +45,18 @@ class SachetController {
     res.send(sachets)
   }
 
+  static getUnsubscribedEmails = async (req: Request, res: Response) => {
+    const sachetRepository = getRepository(UnsubscribedEmail)
+    const unsubscribedEmails = await sachetRepository.find({
+      select: [
+        'email',
+        'createdAt',
+      ],
+    })
+
+    res.send(unsubscribedEmails)
+  }
+
   static getOneById = async (req: Request, res: Response) => {
     const id = hashids.decode(req.params.id)[0] as number
 
@@ -238,6 +250,31 @@ class SachetController {
     }
 
     return res.status(200).send('Email désabonné')
+  }
+
+  static unsubscribeEmails = async (req: Request, res: Response) => {
+    const {emails} = req.body
+
+    console.log(emails);
+
+    if (!emails || ! emails.length) {
+      return res.status(400).send('Not emails')
+    }
+
+    const emailRepository = getRepository(UnsubscribedEmail)
+
+    try {
+      const savedEmails = await Promise.all(emails.map(email => {
+        const unsubscribedEmail = new UnsubscribedEmail(email)
+
+        return emailRepository.save(unsubscribedEmail)
+      }));
+
+      return res.status(200).send(savedEmails)
+    } catch (error) {
+      console.log(error);
+      return res.status(404).send('Email not unsubscribed')
+    }
   }
 
   static massiveSend = async (req: Request, res: Response) => {
