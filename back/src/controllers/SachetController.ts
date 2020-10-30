@@ -255,8 +255,6 @@ class SachetController {
   static unsubscribeEmails = async (req: Request, res: Response) => {
     const {emails} = req.body
 
-    console.log(emails);
-
     if (!emails || ! emails.length) {
       return res.status(400).send('Not emails')
     }
