@@ -3,8 +3,8 @@ import {
     PrimaryGeneratedColumn,
     Column,
     CreateDateColumn,
-    UpdateDateColumn
-} from "typeorm";
+    UpdateDateColumn, Index,
+} from 'typeorm'
 import {Length} from "class-validator";
 
 @Entity()
@@ -43,6 +43,7 @@ export class Sachet {
     frontColor: string;
 
     @Column({length: 128})
+    @Index()
     email: string;
 
     @Column({nullable: true, length: 512})
