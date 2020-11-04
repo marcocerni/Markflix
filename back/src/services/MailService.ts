@@ -38,7 +38,7 @@ export class EmailService {
 
   async sendMail(toEmail: string, subject: string, body: string, logo?: Buffer, massive = true): Promise<object> {
 
-    if (this.unsubscribedEmails.includes(toEmail.toLowerCase())) {
+    if (massive && this.unsubscribedEmails.includes(toEmail.toLowerCase())) {
       throw new Error(`Email unsubscribed: ${toEmail}`)
     }
 
