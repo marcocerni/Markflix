@@ -359,13 +359,13 @@ function updateCheckboxesByDomains() {
     return new RegExp(regexBase + domainReplaced)
   })
 
-  $('.csv-content tr').each((i, e) => {
-    const email = $(e).find('td:nth-child(3)').text().toLowerCase().trim()
+  $('.check-row').each((i, e) => {
+    const check = $(e)
+    const email = check.data('email').toLowerCase().trim()
 
     const hasSomeRegex = domainsRegex.some(domainRegex => domainRegex.test(email))
     const isInBlacklist = emails.includes(email)
 
-    const check = $(e).find('.check-row')
     if (check.prop('checked')) {
       check.prop('checked', !(hasSomeRegex || isInBlacklist))
     }
@@ -398,16 +398,34 @@ $(document).on('change', '#csv-file', (e) => {
       $('#email-extensions').html('')
       updateCsvLines(csv.length)
 
+      let count = 0
+
+      const regexBase = '[a-zA-Z\\-0-9\\.]+@[a-zA-Z\\-0-9\\.]*'
+      const starRegex = '([a-zA-Z\\-0-9\\.]+)*'
+
+      const domainsRegex = domains.map(domain => {
+        const domainReplaced = domain.replace(/\*/g, starRegex).replace(/\./g, '\\.')
+        return new RegExp(regexBase + domainReplaced)
+      })
+
       const html = csv.reduce((html, line, index) => {
+        const email = line[0].toLowerCase().trim()
+
+        const hasSomeRegex = domainsRegex.some(domainRegex => domainRegex.test(email))
+        const isInBlacklist = emails.includes(email)
+        const checked = !(hasSomeRegex || isInBlacklist)
+
+        if (checked) count++
 
         html += `<tr>
             <td>
             <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input check-row" data-index="${index}" data-email="${line[0]}" checked>
+            <input type="checkbox" class="form-check-input check-row" 
+            data-index="${index}" data-email="${email}" ${checked ? 'checked' : ''}>
             </div>
             </td>
             <td>${index + 1}</td>
-            <td>${line[0]}</td>
+            <td>${email}</td>
             <td>${line[1]}</td>
             <td><img src="${line[2]}" class="logo-image"/></td>
             <td>${line[3] ? line[3] : ''}</td>
@@ -420,11 +438,9 @@ $(document).on('change', '#csv-file', (e) => {
       $('#send-emails').prop('disabled', csv.length === 0)
       $('#save-sachets').prop('disabled', csv.length === 0)
       $('#download-rows').prop('disabled', csv.length === 0)
-      // $('.download-images').prop('disabled', csv.length === 0)
 
       $('.csv-content').html(html)
-
-      updateCheckboxesByDomains()
+      updateCsvLines(count)
     }).catch(error => {
       Toastify({
         text: 'Error on file',
@@ -503,7 +519,7 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
   const sachetResult = []
 
   await saveUnsubscribedEmails(checkboxEmails)
-  checkboxEmails = [];
+  checkboxEmails = []
 
   const errors = []
   sachetChunks.reduce((current, sachetChunk, indexChunk) => {
