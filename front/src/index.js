@@ -16,7 +16,9 @@ import {
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader'
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
-import SachetImageGenerator, { loadFile } from './SachetImageGenerator'
+import SachetImageGenerator, { formatDate, loadFile } from './SachetImageGenerator'
+import { saveAs } from 'file-saver'
+import Toastify from 'toastify-js'
 
 //https://stackoverflow.com/questions/923885/capture-html-canvas-as-gif-jpg-png-pdf
 //https://stackoverflow.com/questions/158750/can-you-combine-multiple-images-into-a-single-one-using-javascript
@@ -269,9 +271,9 @@ function renderAllImages(parameters) {
     sachetGenerator.updateCanvas(parameters).then(() => {
       return loadTexture(sachetGenerator.getResultBack(), false)
     }),
-  ]).then(() => {
+  ])/*.then(() => {
     return sachetGenerator.generatePrintImage(parameters)
-  })
+  })*/
 }
 
 $(document).on('change', 'input', (e) => {
@@ -361,10 +363,17 @@ $(window).on('load', async () => {
   $('.loader').fadeOut()
 })
 
-document.getElementById('download-front').addEventListener('click', function() {
-  this.href = sachetGenerator.getResult()
-  this.download = (sachetId ? sachetId : 'not-saved-sachet') + '.png'
-}, false)
+$('.download-front').click(async function() {
+  const madeDate = formatDate(new Date($('#inputMadeDate').val()));
+  const lotNumber = $('#inputLotNumber').val();
+
+  await sachetGenerator.generatePrintImage(parameters, madeDate, lotNumber)
+
+  const fileContent = sachetGenerator.getResult()
+  const fileName = (sachetId ? sachetId : 'not-saved-sachet') + '.png'
+
+  saveAs(fileContent, fileName)
+});
 
 $('form').submit(function(e) {
   e.preventDefault()
@@ -395,11 +404,23 @@ $('form').submit(function(e) {
       showSachetId(sachetId)
 
       updateFormResult(true)
+
+      Toastify({
+        text: `Email sent`,
+        duration: 3000,
+        backgroundColor: 'linear-gradient(to right, rgb(0, 176, 155), rgb(150, 201, 61))',
+      }).showToast()
     },
     error: function(error) {
       console.error(error)
       $button.html(oldContent)
       $button.prop('disabled', false)
+
+      Toastify({
+        text: `Error sending email: ${error.message}`,
+        duration: 3000,
+        backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
+      }).showToast()
     },
   })
 
@@ -410,3 +431,5 @@ $('.btn-back').click(function() {
   const newUrl = window.location.protocol + '//' + window.location.host + window.location.pathname + '?uxv&id=' + sachetHash
   window.location.href = newUrl
 })
+
+$('#inputMadeDate').val(new Date().toISOString().substr(0, 10))

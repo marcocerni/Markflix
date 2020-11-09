@@ -7,6 +7,7 @@ import { EmailService } from '../services/MailService'
 import config from '../config/config'
 import * as https from 'https'
 import { UnsubscribedEmail } from '../entity/UnsubscribedEmail'
+import { UnsubscribedDomain } from '../entity/UnsubscribedDomain'
 
 const Hashids = require('hashids/cjs')
 const validUrl = require('valid-url')
@@ -55,6 +56,18 @@ class SachetController {
     })
 
     res.send(unsubscribedEmails)
+  }
+
+  static getUnsubscribedDomains = async (req: Request, res: Response) => {
+    const domainRepository = getRepository(UnsubscribedDomain)
+    const unsubscribedDomains = await domainRepository.find({
+      select: [
+        'domain',
+        'createdAt',
+      ],
+    })
+
+    res.send(unsubscribedDomains)
   }
 
   static getOneById = async (req: Request, res: Response) => {
@@ -253,25 +266,54 @@ class SachetController {
   }
 
   static unsubscribeEmails = async (req: Request, res: Response) => {
-    const {emails} = req.body
+    const { emails } = req.body
 
-    if (!emails || ! emails.length) {
+    if (!emails || !emails.length) {
       return res.status(400).send('Not emails')
     }
 
     const emailRepository = getRepository(UnsubscribedEmail)
 
     try {
-      const savedEmails = await Promise.all(emails.map(email => {
+      const savedEmails = await Promise.all(emails.map(async email => {
+        const alreadyCreated = await emailRepository.findOne({email: email});
+        if (alreadyCreated) return alreadyCreated;
+
         const unsubscribedEmail = new UnsubscribedEmail(email)
 
         return emailRepository.save(unsubscribedEmail)
-      }));
+      }))
 
       return res.status(200).send(savedEmails)
     } catch (error) {
-      console.log(error);
+      console.log(error)
       return res.status(404).send('Email not unsubscribed')
+    }
+  }
+
+  static unsubscribeDomains = async (req: Request, res: Response) => {
+    const { domains } = req.body
+
+    if (!domains || !domains.length) {
+      return res.status(400).send('Not domains')
+    }
+
+    const domainRepository = getRepository(UnsubscribedDomain)
+
+    try {
+      const savedDomains = await Promise.all(domains.map(async domain => {
+        const alreadyCreated = await domainRepository.findOne({domain: domain})
+        if (alreadyCreated) return alreadyCreated
+
+        const unsubscribedDomain = new UnsubscribedDomain(domain)
+
+        return domainRepository.save(unsubscribedDomain)
+      }))
+
+      return res.status(200).send(savedDomains)
+    } catch (error) {
+      console.log(error)
+      return res.status(404).send('Domains not unsubscribed')
     }
   }
 

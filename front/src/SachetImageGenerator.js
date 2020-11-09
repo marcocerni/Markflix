@@ -226,7 +226,7 @@ export default class SachetImageGenerator {
       })
   }
 
-  async generatePrintImage(parameters) {
+  async generatePrintImage(parameters, date = formatDate(), lotNumber = 'C2005284') {
 
     this.cctx.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT)
 
@@ -322,6 +322,12 @@ export default class SachetImageGenerator {
       }).catch((err) => {
         console.error(err)
       })
+
+    this.cctx.font = '36px Arial'
+    this.cctx.fillText(date, (CANVAS_WIDTH * 2) - 380, CANVAS_HEIGHT - 423)
+
+    this.cctx.font = '36px Arial'
+    this.cctx.fillText(lotNumber, (CANVAS_WIDTH * 2) - 380, CANVAS_HEIGHT - 362)
   }
 
   getResult() {
@@ -402,4 +408,17 @@ export function loadFileAsText(file) {
     }
     fr.readAsText(file)
   })
+}
+
+export function formatDate(date = new Date()) {
+  let dd = date.getDate()
+  let mm = date.getMonth() + 1
+
+  if (dd < 10)
+    dd = '0' + dd
+
+  if (mm < 10)
+    mm = '0' + mm
+
+  return dd + '/' + mm + '/' + date.getFullYear()
 }

@@ -94,6 +94,7 @@
         }
 
     </style>
+    <link href="public/fontawesome/css/all.min.css" rel="stylesheet">
     <title>GEL + FRANCE - Mailer</title>
 </head>
 <body>
@@ -126,6 +127,8 @@
     <div class="card">
         <div class="card-body">
 
+            <a class="btn btn-lg btn-dark" type="button" id="download-all">Tous les Sachets 📦</a>
+
             <div class="tab-content">
                 <div class="tab-pane fade show active" id="mailing" role="tabpanel" aria-labelledby="mailing-tab">
 
@@ -148,22 +151,21 @@
 
                     <div class="text-center">
                         <div class="btn-group" role="group" aria-label="Basic example">
-                            <a class="btn btn-lg btn-dark" type="button" id="download-all">Tous les Sachets 📦</a>
-                            <a class="btn btn-lg btn-secondary" type="button" disabled="disabled" id="download-rows">Télécharger
-                                CSV
-                                💾</a>
+                            <a class="btn btn-lg btn-secondary" type="button" disabled="disabled" id="download-rows">
+                                Télécharger CSV 💾
+                            </a>
                             <button class="btn btn-lg btn-warning" type="button" disabled="disabled" id="save-sachets">
-                                Générer
-                                Sachets 🏄
+                                Générer Sachets 🏄
                             </button>
                             <button class="btn btn-lg btn-primary" type="button" disabled="disabled" id="send-emails">
-                                Envoyer mails
-                                🛫
+                                Envoyer mails 🛫
                             </button>
-                            <button class="btn btn-lg btn-primary" type="button" disabled="disabled"
-                                    id="download-images">
-                                Télécharger Images
-                                🛹
+                            <button class="btn btn-lg btn-primary download-images" type="button" disabled="disabled">
+                                Télécharger Images 🛹
+                            </button>
+                            <button type="button" class="btn btn-primary" data-toggle="modal"
+                                    data-target="#sachetModal">
+                                <i class="fas fa-cog"></i>
                             </button>
                         </div>
                     </div>
@@ -194,23 +196,27 @@
                                     <th scope="col">Generated ID</th>
                                     <th scope="col">Generated Link</th>
                                 </tr>
-                                <tr>
-                                    <th scope="col" colspan="2">
-                                        <!--                                <h4><span class="badge badge-pill badge-primary">Filter</span></h4>-->
-                                    </th>
-                                    <th scope="col">
-                                        <input type="text"
-                                               class="form-control"
-                                               placeholder="Par example 'gouv.fr,.us,.pl'"
-                                               id="email-extensions"/>
-                                    </th>
-                                    <th scope="col"></th>
-                                    <th scope="col" colspan="3" class="text-right">
-                                        <button class="btn btn-primary" type="button" id="filter-rows">
-                                            Filtrer
-                                        </button>
-                                    </th>
-                                </tr>
+<!--                                <tr>-->
+<!--                                    <th scope="col" colspan="2">-->
+<!--                                        <button class="btn btn-primary filter-rows" type="button">-->
+<!--                                            Filtrer-->
+<!--                                            <i class="fa fa-filter"></i>-->
+<!--                                        </button>-->
+<!--                                    </th>-->
+<!--                                    <th scope="col">-->
+<!--                                        <input type="text"-->
+<!--                                               class="form-control"-->
+<!--                                               placeholder="Par example 'gouv.fr,.us,.pl'"-->
+<!--                                               id="email-extensions"/>-->
+<!--                                    </th>-->
+<!--                                    <th scope="col"></th>-->
+<!--                                    <th scope="col" colspan="3" class="text-right">-->
+<!--                                        <button class="btn btn-primary filter-rows" type="button">-->
+<!--                                            Filtrer-->
+<!--                                            <i class="fa fa-filter"></i>-->
+<!--                                        </button>-->
+<!--                                    </th>-->
+<!--                                </tr>-->
                                 </thead>
                                 <tbody class="csv-content">
                                 <tr>
@@ -224,6 +230,40 @@
 
 
                 <div class="tab-pane fade" id="blacklist" role="tabpanel" aria-labelledby="blacklist-tab">
+
+                    <div class="form-group">
+                        <label class="lead">Domaines <span class="lines-detail-blacklist-domains"></span></label>
+                        <form class="form-blacklist-domains">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Domains</th>
+                                        <th scope="col">Date</th>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <button class="btn btn-primary" type="submit">
+                                                Ajouter
+                                            </button>
+                                        </td>
+                                        <td><input type="text"
+                                                   class="form-control"
+                                                   name="domain"
+                                                   placeholder="Par example : test.*.fr"
+                                                   required/>
+                                        </td>
+                                        <td>
+                                        </td>
+                                    </tr>
+                                    </thead>
+                                    <tbody class="blacklist-content-domains">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
 
                     <form class="form-blacklist">
                         <div class="form-group">
@@ -254,17 +294,18 @@
                                         <th scope="col">Date</th>
                                     </tr>
                                     <tr>
-                                        <td></td>
-                                        <td><input type="email"
-                                                   class="form-control"
-                                                   name="email"
-                                                   placeholder=""
-                                                   required/>
-                                        </td>
                                         <td>
                                             <button class="btn btn-primary" type="submit">
                                                 Ajouter
                                             </button>
+                                        </td>
+                                        <td><input type="email"
+                                                   class="form-control"
+                                                   name="email"
+                                                   placeholder="Par example : ivan@test.com"
+                                                   required/>
+                                        </td>
+                                        <td>
                                         </td>
                                     </tr>
                                     </thead>
@@ -279,6 +320,35 @@
 
             </div>
 
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="sachetModal" tabindex="-1" aria-labelledby="sachetModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Paramètres Sachet</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="inputMadeDate">Date de fabrication</label>
+                    <input type="date" class="form-control" id="inputMadeDate"/>
+                </div>
+                <div class="form-group">
+                    <label for="inputLotNumber">Lot</label>
+                    <input type="text" class="form-control" id="inputLotNumber" value="C2005284"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-lg btn-primary download-images" type="button" disabled="disabled">
+                    Télécharger Images
+                    🛹
+                </button>
+            </div>
         </div>
     </div>
 </div>

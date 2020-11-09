@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
     <link rel="stylesheet" href="style.css?v=1">
+    <link href="public/fontawesome/css/all.min.css" rel="stylesheet">
     <title>GEL + FRANCE - Configurateur 3D</title>
 </head>
 <body>
@@ -50,7 +51,8 @@
             <label class="lead">Fond Recto</label>
 
             <div class="input-group mb-2">
-                <input type="color" class="form-control" id="face-color" value="#ffffff" data-default-value="#ffffff"  name="face-color">
+                <input type="color" class="form-control" id="face-color" value="#ffffff" data-default-value="#ffffff"
+                       name="face-color">
                 <div class="input-group-append">
                     <span class="input-group-text">Couleur</span>
                 </div>
@@ -70,7 +72,8 @@
             </div>
 
             <div class="input-group mb-2">
-                <input type="color" class="form-control" id="face-font-color" value="#000000" data-default-value="#000000"  name="face-font-color">
+                <input type="color" class="form-control" id="face-font-color" value="#000000"
+                       data-default-value="#000000" name="face-font-color">
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <label>Couleur du texte</label>
@@ -83,7 +86,8 @@
             <label class="lead">Fond Verso</label>
 
             <div class="input-group mb-2">
-                <input type="color" class="form-control" id="back-color" value="#ffffff" data-default-value="#ffffff"  name="back-color">
+                <input type="color" class="form-control" id="back-color" value="#ffffff" data-default-value="#ffffff"
+                       name="back-color">
                 <div class="input-group-append">
                     <span class="input-group-text">Couleur</span>
                 </div>
@@ -103,7 +107,8 @@
             </div>
 
             <div class="input-group mb-2">
-                <input type="color" class="form-control" id="back-font-color" value="#000000" data-default-value="#000000" name="back-font-color">
+                <input type="color" class="form-control" id="back-font-color" value="#000000"
+                       data-default-value="#000000" name="back-font-color">
                 <div class="input-group-append">
                     <div class="input-group-text">
                         <label>Couleur du texte</label>
@@ -146,11 +151,42 @@
        aria-controls="collapseExample">
         Image
     </a>
-    <a class="btn btn-primary btn-download" type="submit" id="download-front">Télécharger</a>
+    <div class="btn-group">
+        <button class="btn btn-primary btn-download download-front" type="button">Télécharger</button>
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#sachetModal">
+            <i class="fas fa-cog"></i>
+        </button>
+    </div>
 </div>
 <div class="canvas-container collapse" id="the-canvas">
     <canvas id="canvas-front"></canvas>
     <canvas id="canvas"></canvas>
+</div>
+
+<div class="modal fade" id="sachetModal" tabindex="-1" aria-labelledby="sachetModal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Paramètres Sachet</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="inputMadeDate">Date de fabrication</label>
+                    <input type="date" class="form-control" id="inputMadeDate"/>
+                </div>
+                <div class="form-group">
+                    <label for="inputLotNumber">Lot</label>
+                    <input type="text" class="form-control" id="inputLotNumber" value="C2005284"/>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary download-front">Télécharger</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <div>
@@ -174,11 +210,15 @@
 <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-180708451-1"></script>
 <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+  window.dataLayer = window.dataLayer || []
 
-  gtag('config', 'UA-180708451-1');
+  function gtag() {
+    dataLayer.push(arguments)
+  }
+
+  gtag('js', new Date())
+
+  gtag('config', 'UA-180708451-1')
 </script>
 <script src="https://code.jquery.com/jquery-3.5.1.min.js" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"

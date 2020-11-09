@@ -1,5 +1,5 @@
 import Toastify from 'toastify-js'
-import SachetImageGenerator, { loadFileAsText } from './SachetImageGenerator'
+import SachetImageGenerator, { formatDate, loadFileAsText } from './SachetImageGenerator'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 
@@ -7,7 +7,8 @@ const loginUrl = `${backUrl}/auth/login`
 const postUrl = `${backUrl}/sachet/massive`
 const getAllSachetsUrl = `${backUrl}/sachet`
 const getAllUnsubscribedEmailsUrl = `${backUrl}/sachet/unsubscribe`
-let editor, csv, sachets
+const getAllUnsubscribedDomainsUrl = `${backUrl}/sachet/domain`
+let editor, csv, sachets, domains, emails, checkboxEmails = []
 
 const sachetGenerator = new SachetImageGenerator()
 
@@ -68,7 +69,7 @@ $('#login-form').submit(function(e) {
       username: $('#username').val(),
       password: $('#password').val(),
     },
-    success: function(jwt) {
+    success: async function(jwt) {
       Toastify({
         text: 'Bienvenu',
         duration: 3000,
@@ -80,7 +81,10 @@ $('#login-form').submit(function(e) {
 
       window.localStorage.setItem('session', jwt)
 
-      getUnsubscribedEmails()
+      const results = await Promise.all([getUnsubscribedEmails(), getUnsubscribedDomains()])
+
+      emails = results[0]
+      domains = results[1]
 
       $('#login-form').slideUp(function() {
         $('.csv-container').slideDown()
@@ -142,35 +146,87 @@ document.getElementById('download-all').addEventListener('click', function() {
 
 
 function getUnsubscribedEmails() {
-  $.ajax({
-    url: getAllUnsubscribedEmailsUrl,
-    type: 'GET',
-    headers: {
-      'Authorization': `Bearer ${window.localStorage.getItem('session')}`,
-    },
-    success: (unsubscribedEmails) => {
-      $('.lines-detail-blacklist').html(unsubscribedEmails.length)
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: getAllUnsubscribedEmailsUrl,
+      type: 'GET',
+      headers: {
+        'Authorization': `Bearer ${window.localStorage.getItem('session')}`,
+      },
+      success: (unsubscribedEmails) => {
+        $('.lines-detail-blacklist').html(unsubscribedEmails.length)
 
-      const html = unsubscribedEmails.reduce((html, unsubscribedEmail, index) => {
+        const emails = []
+        const html = unsubscribedEmails.reduce((html, unsubscribedEmail, index) => {
 
-        html += `<tr>
+          html += `<tr>
             <td>${index + 1}</td>
             <td>${unsubscribedEmail.email}</td>
             <td>${new Date(unsubscribedEmail.createdAt).toLocaleString()}</td>
         </tr>`
 
-        return html
-      }, '')
+          emails.push(unsubscribedEmail.email)
 
-      $('.blacklist-content').html(html)
-    },
-    error: (error) => {
-      Toastify({
-        text: error.statusText,
-        duration: 3000,
-        backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
-      }).showToast()
-    },
+          return html
+        }, '')
+
+        $('.blacklist-content').html(html)
+
+        resolve(emails)
+      },
+      error: (error) => {
+        Toastify({
+          text: error.statusText,
+          duration: 3000,
+          backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
+        }).showToast()
+
+        reject()
+      },
+    })
+  })
+}
+
+
+function getUnsubscribedDomains() {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url: getAllUnsubscribedDomainsUrl,
+      type: 'GET',
+      headers: {
+        'Authorization': `Bearer ${window.localStorage.getItem('session')}`,
+      },
+      success: (unsubscribedDomains) => {
+        $('.lines-detail-blacklist-domains').html(unsubscribedDomains.length)
+
+        const domains = []
+        const html = unsubscribedDomains.reduce((html, unsubscribedDomain, index) => {
+
+          html += `<tr>
+            <td>${index + 1}</td>
+            <td>${unsubscribedDomain.domain}</td>
+            <td>${new Date(unsubscribedDomain.createdAt).toLocaleString()}</td>
+        </tr>`
+
+          domains.push(unsubscribedDomain.domain)
+
+          return html
+        }, '')
+
+        $('.blacklist-content-domains').html(html)
+
+        resolve(domains)
+      },
+      error: (error) => {
+        Toastify({
+          text: error.statusText,
+          duration: 3000,
+          backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
+        }).showToast()
+
+        reject()
+      },
+    })
   })
 }
 
@@ -217,6 +273,49 @@ function saveUnsubscribedEmails(emails) {
   })
 }
 
+function saveUnsubscribedDomains(domains) {
+  return new Promise((resolve, reject) => {
+
+    $.ajax({
+      url: getAllUnsubscribedDomainsUrl,
+      type: 'POST',
+      data: {
+        domains: domains,
+      },
+      headers: {
+        'Authorization': `Bearer ${window.localStorage.getItem('session')}`,
+      },
+      success: (newUnsubscribedDomains) => {
+        const numberOfLines = parseInt($('.lines-detail-blacklist-domains').html()) + newUnsubscribedDomains.length
+        $('.lines-detail-blacklist-domains').html(numberOfLines)
+
+        const html = newUnsubscribedDomains.reduce((html, unsubscribedDomain, index) => {
+
+          html += `<tr>
+            <td>${index + 1}</td>
+            <td>${unsubscribedDomain.domain}</td>
+            <td>${new Date(unsubscribedDomain.createdAt).toLocaleString()}</td>
+        </tr>`
+
+          return html
+        }, '')
+
+        $('.blacklist-content-domains').html(html + $('.blacklist-content-domains').html())
+
+        resolve(newUnsubscribedDomains)
+      },
+      error: (error) => {
+        Toastify({
+          text: error.statusText,
+          duration: 3000,
+          backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
+        }).showToast()
+        reject(error)
+      },
+    })
+  })
+}
+
 let fileName
 
 if (typeof String.prototype.endsWith !== 'function') {
@@ -225,7 +324,7 @@ if (typeof String.prototype.endsWith !== 'function') {
   }
 }
 
-$(document).on('click', '#filter-rows', (e) => {
+$(document).on('click', '.filter-rows', (e) => {
   const extensionsText = $('#email-extensions').val()
   const extensions = extensionsText ? extensionsText.split(',') : []
 
@@ -248,6 +347,35 @@ $(document).on('click', '#filter-rows', (e) => {
 
   updateCsvLines(count)
 })
+
+function updateCheckboxesByDomains() {
+  let count = 0
+
+  const regexBase = '(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@([a-zA-Z\\-0-9\\.]+)*'
+  const starRegex = '([a-zA-Z\\-0-9\\.]+)*'
+
+  const domainsRegex = domains.map(domain => {
+    const domainReplaced = domain.replace(/\*/g, starRegex).replace(/\./g, '\\.')
+    return new RegExp(regexBase + domainReplaced)
+  })
+
+  $('.csv-content tr').each((i, e) => {
+    const email = $(e).find('td:nth-child(3)').text().toLowerCase().trim()
+
+    const hasSomeRegex = domainsRegex.some(domainRegex => domainRegex.test(email))
+    const isInBlacklist = emails.includes(email)
+
+    const check = $(e).find('.check-row')
+    if (check.prop('checked')) {
+      check.prop('checked', !(hasSomeRegex || isInBlacklist))
+    }
+
+    if (!hasSomeRegex)
+      count++
+  })
+
+  updateCsvLines(count)
+}
 
 function updateCsvLines(filteredLines) {
   $('.lines-detail').html(`(${filteredLines} de ${csv.length})`)
@@ -273,7 +401,11 @@ $(document).on('change', '#csv-file', (e) => {
       const html = csv.reduce((html, line, index) => {
 
         html += `<tr>
-            <td><div class="form-group form-check"><input type="checkbox" class="form-check-input check-row" data-index="${index}" checked></div></td>
+            <td>
+            <div class="form-group form-check">
+            <input type="checkbox" class="form-check-input check-row" data-index="${index}" data-email="${line[0]}" checked>
+            </div>
+            </td>
             <td>${index + 1}</td>
             <td>${line[0]}</td>
             <td>${line[1]}</td>
@@ -288,8 +420,11 @@ $(document).on('change', '#csv-file', (e) => {
       $('#send-emails').prop('disabled', csv.length === 0)
       $('#save-sachets').prop('disabled', csv.length === 0)
       $('#download-rows').prop('disabled', csv.length === 0)
+      // $('.download-images').prop('disabled', csv.length === 0)
 
       $('.csv-content').html(html)
+
+      updateCheckboxesByDomains()
     }).catch(error => {
       Toastify({
         text: 'Error on file',
@@ -302,6 +437,7 @@ $(document).on('change', '#csv-file', (e) => {
       $('#send-emails').prop('disabled', false)
       $('#save-sachets').prop('disabled', false)
       $('#download-rows').prop('disabled', false)
+      // $('.download-images').prop('disabled', false)
     })
   }
 })
@@ -319,8 +455,8 @@ document.getElementById('download-rows').addEventListener('click', function() {
   this.download = fileName ? fileName : 'output.csv'
 }, false)
 
-document.getElementById('download-images').addEventListener('click', function() {
-  const $button = $('#download-images')
+$('.download-images').click(function() {
+  const $button = $(this)
   const oldContent = $button.html()
   $button.html(oldContent + ' <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>')
   $button.prop('disabled', true)
@@ -335,10 +471,11 @@ document.getElementById('download-images').addEventListener('click', function() 
       duration: 3000,
       backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
     }).showToast()
+
     $button.html(oldContent)
     $button.prop('disabled', false)
   })
-}, false)
+})
 
 $(document).on('click', '#send-emails, #save-sachets', async (e) => {
   e.preventDefault()
@@ -364,6 +501,9 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
 
   const sachetChunks = chunkArrayInGroups(csvFiltered, 100)
   const sachetResult = []
+
+  await saveUnsubscribedEmails(checkboxEmails)
+  checkboxEmails = [];
 
   const errors = []
   sachetChunks.reduce((current, sachetChunk, indexChunk) => {
@@ -425,7 +565,7 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
 
     sachets = sachetResult
 
-    $('#download-images').prop('disabled', !sachets.length)
+    $('.download-images').prop('disabled', !sachets.length)
   })
 
   return false
@@ -468,9 +608,25 @@ $(document).on('change', '.check-all', function(event) {
   })
 })
 
+$(document).on('change', '.check-row', function(event) {
+  const $checkbox = $(event.target)
+  const checked = $checkbox.prop('checked')
+  const email = $checkbox.data('email')
+
+
+  if (!checked) {
+    checkboxEmails.push(email)
+  } else {
+    const index = checkboxEmails.indexOf(email)
+    checkboxEmails.splice(index, 1)
+  }
+})
+
 /* ZIP File */
 async function downloadSachetsAsZip(sachets) {
 
+  const madeDate = formatDate(new Date($('#inputMadeDate').val()))
+  const lotNumber = $('#inputLotNumber').val()
   const sachetChunks = chunkArrayInGroups(sachets.filter(s => s && s.id && s.logo && !s.logo.startsWith('http')), 100)
   let processedLine = 0, processedChunk = 0
 
@@ -483,7 +639,7 @@ async function downloadSachetsAsZip(sachets) {
       processedLine++
 
       try {
-        await sachetGenerator.generatePrintImage(SachetImageGenerator.getDefaultParameters(sachet.logo))
+        await sachetGenerator.generatePrintImage(SachetImageGenerator.getDefaultParameters(sachet.logo), madeDate, lotNumber)
 
         const dataUrl = sachetGenerator.getResult().split(',')[1]
 
@@ -508,8 +664,6 @@ async function downloadSachetsAsZip(sachets) {
     duration: 3000,
     backgroundColor: 'linear-gradient(to right, rgb(0, 176, 155), rgb(150, 201, 61))',
   }).showToast()
-
-
 }
 
 /* ZIP File */
@@ -541,9 +695,23 @@ $('.form-blacklist').submit(async function(e) {
 
   await saveUnsubscribedEmails(mails)
 
+  emails.push(...mails)
+
   $email.val('')
   $csvMails.val('')
 })
+
+$('.form-blacklist-domains').submit(async function(e) {
+  e.preventDefault()
+
+  const domain = $(this).find('[name="domain"]').val()
+
+  await saveUnsubscribedDomains([domain])
+
+  domains.push(domain)
+})
+
+$('#inputMadeDate').val(new Date().toISOString().substr(0, 10))
 
 /* CSV Parsing */
 function CSVToArray(strData, strDelimiter) {
