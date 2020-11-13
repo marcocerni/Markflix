@@ -7,23 +7,18 @@ import { UnsubscribedEmail } from '../entity/UnsubscribedEmail'
 
 export class EmailService {
   private transporter: any
-  private transporterMassive: any
+  private fromUser: any
   private unsubscribedEmails: string[]
 
-  constructor() {
-    this.transporter = nodemailer.createTransport({
-      service: config.email.service,
-      auth: {
-        user: config.email.user,
-        pass: config.email.password,
-      },
-    })
+  constructor(emailProvider: 'gmail' | 'sendinblue' | 'sendgrid' = 'gmail') {
+    const providerConfig = config.emailProviders[emailProvider] ?? config.emailProviders.gmail;
+    this.fromUser = providerConfig.fromUser;
 
-    this.transporterMassive = nodemailer.createTransport({
-      service: config.emailMassive.service,
+    this.transporter = nodemailer.createTransport({
+      service: providerConfig.service,
       auth: {
-        user: config.emailMassive.user,
-        pass: config.emailMassive.password,
+        user: providerConfig.user,
+        pass: providerConfig.password,
       },
     })
 
@@ -64,10 +59,8 @@ export class EmailService {
       }]
     }
 
-    const transporter = massive ? this.transporterMassive : this.transporter
-
-    return transporter.sendMail({
-      from: massive ? config.emailMassive.fromUser : config.email.fromUser,
+    return this.transporter.sendMail({
+      from: this.fromUser,
       to: toEmail,
       subject: subject,
       html: body,

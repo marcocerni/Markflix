@@ -3,19 +3,27 @@ export default {
   port: 3000,
   jwt: {
     secret: "XXXXHAHISISAHXXXXXXXXX",
-    expiration: "1h"
+    expiration: "2d"
   },
-  email: {
-    service: 'gmail', //'SendinBlue'
-    user: 'gelplusfrance@gmail.com',
-    password: 'XXXXXXXXXXX',
-    fromUser: 'gelplusfrance@gmail.com',
-  },
-  emailMassive: {
-    service: 'SendinBlue', //'gmail'
-    user: 'gelplusfrance@gmail.com',
-    password: 'XXXXXXXXXXX',
-    fromUser: 'gelplusfrance@gmail.com',
+  emailProviders: {
+    gmail: {
+      service: 'gmail',
+      user: 'gelplusfrance@gmail.com',
+      password: 'XXXXXXXXXXX',
+      fromUser: 'gelplusfrance@gmail.com',
+    },
+    sendinblue: {
+      service: 'SendinBlue',
+      user: 'pascal.jehan@vetigraph.com',
+      password: 'XXXXXXXXXXXXXXXXXXXXXX',
+      fromUser: 'contact@gelplus.fr',
+    },
+    sendgrid: {
+      service: 'SendGrid',
+      user: 'apikey',
+      password: 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+      fromUser: 'contact@gelplus.fr',
+    },
   },
   emailTo: 'ivancerni@gmail.com',
   hashSalt: 'XXXXXXXXX'

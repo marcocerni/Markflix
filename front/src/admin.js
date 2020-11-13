@@ -518,8 +518,10 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
   const sachetChunks = chunkArrayInGroups(csvFiltered, 100)
   const sachetResult = []
 
-  await saveUnsubscribedEmails(checkboxEmails)
-  checkboxEmails = []
+  if (checkboxEmails.length) {
+    await saveUnsubscribedEmails(checkboxEmails)
+    checkboxEmails = []
+  }
 
   const errors = []
   sachetChunks.reduce((current, sachetChunk, indexChunk) => {
@@ -534,6 +536,7 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
           content: editor.getData(),
           csv: sachetChunk,
           sendEmails: sendEmails,
+          provider: $('[name="provider"]').val()
         },
       }).then((response) => {
 
@@ -578,6 +581,9 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
 
     $button.html(oldContent)
     $button.prop('disabled', false)
+
+    console.log(sachetResult);
+    console.log(errors);
 
     sachets = sachetResult
 
@@ -691,7 +697,6 @@ $('.form-blacklist [name="csv-mails"]').change((e) => {
 
 $('.form-blacklist').submit(async function(e) {
   e.preventDefault()
-
   let mails
 
   const $csvMails = $(this).find('[name="csv-mails"]')

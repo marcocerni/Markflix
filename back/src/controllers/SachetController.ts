@@ -318,7 +318,7 @@ class SachetController {
   }
 
   static massiveSend = async (req: Request, res: Response) => {
-    const { content, csv, sendEmails } = req.body
+    const { content, csv, sendEmails, provider } = req.body
 
     const lineErrors = []
 
@@ -358,7 +358,7 @@ class SachetController {
 
     if (sendEmails === 'true') {
       console.time('entro email')
-      const emailService = new EmailService()
+      const emailService = new EmailService(provider)
 
       await emailService.init()
 
