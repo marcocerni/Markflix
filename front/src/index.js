@@ -432,4 +432,4 @@ $('.btn-back').click(function() {
   window.location.href = newUrl
 })
 
-$('#inputMadeDate').val(new Date().toISOString().substr(0, 10))
+$('#inputMadeDate').val('2020-05-28')

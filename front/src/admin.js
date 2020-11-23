@@ -84,7 +84,7 @@ $('#login-form').submit(function(e) {
       const results = await Promise.all([getUnsubscribedEmails(), getUnsubscribedDomains()])
 
       emails = results[0]
-      domains = results[1]
+      domains = results[1].map(d => d.trim())
 
       $('#login-form').slideUp(function() {
         $('.csv-container').slideDown()
@@ -324,6 +324,15 @@ if (typeof String.prototype.endsWith !== 'function') {
   }
 }
 
+if (!String.prototype.startsWith) {
+  Object.defineProperty(String.prototype, 'startsWith', {
+    value: function(search, rawPos) {
+      var pos = rawPos > 0 ? rawPos | 0 : 0
+      return this.substring(pos, pos + search.length) === search
+    },
+  })
+}
+
 $(document).on('click', '.filter-rows', (e) => {
   const extensionsText = $('#email-extensions').val()
   const extensions = extensionsText ? extensionsText.split(',') : []
@@ -347,35 +356,6 @@ $(document).on('click', '.filter-rows', (e) => {
 
   updateCsvLines(count)
 })
-
-function updateCheckboxesByDomains() {
-  let count = 0
-
-  const regexBase = '(([^<>()\\[\\]\\\\.,;:\\s@"]+(\\.[^<>()\\[\\]\\\\.,;:\\s@"]+)*)|(".+"))@([a-zA-Z\\-0-9\\.]+)*'
-  const starRegex = '([a-zA-Z\\-0-9\\.]+)*'
-
-  const domainsRegex = domains.map(domain => {
-    const domainReplaced = domain.replace(/\*/g, starRegex).replace(/\./g, '\\.')
-    return new RegExp(regexBase + domainReplaced)
-  })
-
-  $('.check-row').each((i, e) => {
-    const check = $(e)
-    const email = check.data('email').toLowerCase().trim()
-
-    const hasSomeRegex = domainsRegex.some(domainRegex => domainRegex.test(email))
-    const isInBlacklist = emails.includes(email)
-
-    if (check.prop('checked')) {
-      check.prop('checked', !(hasSomeRegex || isInBlacklist))
-    }
-
-    if (!hasSomeRegex)
-      count++
-  })
-
-  updateCsvLines(count)
-}
 
 function updateCsvLines(filteredLines) {
   $('.lines-detail').html(`(${filteredLines} de ${csv.length})`)
@@ -401,11 +381,16 @@ $(document).on('change', '#csv-file', (e) => {
       let count = 0
 
       const regexBase = '[a-zA-Z\\-0-9\\.]+@[a-zA-Z\\-0-9\\.]*'
-      const starRegex = '([a-zA-Z\\-0-9\\.]+)*'
+      const starRegex = '(\\.|\\+|\\-|@|\\w)*'
 
       const domainsRegex = domains.map(domain => {
-        const domainReplaced = domain.replace(/\*/g, starRegex).replace(/\./g, '\\.')
-        return new RegExp(regexBase + domainReplaced)
+        const domainReplaced = domain.replace(/\./g, '\\.').replace(/\*/g, starRegex).toString()
+
+        if (domain.endsWith('*') || domain.startsWith('*')) {
+          return new RegExp(domainReplaced)
+        } else {
+          return new RegExp(regexBase + domainReplaced)
+        }
       })
 
       const html = csv.reduce((html, line, index) => {
@@ -536,7 +521,7 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
           content: editor.getData(),
           csv: sachetChunk,
           sendEmails: sendEmails,
-          provider: $('[name="provider"]').val()
+          provider: $('[name="provider"]').val(),
         },
       }).then((response) => {
 
@@ -582,8 +567,8 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
     $button.html(oldContent)
     $button.prop('disabled', false)
 
-    console.log(sachetResult);
-    console.log(errors);
+    console.log(sachetResult)
+    console.log(errors)
 
     sachets = sachetResult
 
@@ -732,7 +717,7 @@ $('.form-blacklist-domains').submit(async function(e) {
   domains.push(domain)
 })
 
-$('#inputMadeDate').val(new Date().toISOString().substr(0, 10))
+$('#inputMadeDate').val('2020-05-28')
 
 /* CSV Parsing */
 function CSVToArray(strData, strDelimiter) {
