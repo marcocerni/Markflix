@@ -320,9 +320,6 @@ class SachetController {
   static massiveSend = async (req: Request, res: Response) => {
     const { content, csv, sendEmails, provider, avoidDuplicates } = req.body
 
-    console.log("sendEmails", sendEmails, typeof sendEmails);
-    console.log("avoidDuplicates", avoidDuplicates, typeof avoidDuplicates);
-
     const lineErrors = []
 
     const sachets = await Promise.all(csv.map(async (line, index) => {
