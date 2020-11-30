@@ -34,14 +34,18 @@ export class ImageService {
     fs.unlinkSync(`${IMAGE_FOLDER_PATH}/${filename}`)
   }
 
-  static async createSachetImage(logo: string) {
-    let parts = logo.split(';');
-    let mimType = parts[0].split(':')[1];
-    let imageData = parts[1].split(',')[1];
+  static async createSachetImage(logo: string = '') {
+    let parts = logo.split(';')
+    let mimType = parts[0].split(':')[1]
+    let imageData = parts[1].split(',')[1]
 
-    const logoImage = await sharp(Buffer.from(imageData, 'base64')).resize({width: 250}).toBuffer();
-    return sharp(__dirname +'/../static/Sachet.png')
-      .composite([{ input: await sharp(logoImage).toBuffer(), top: 160, left: 75}]).jpeg({quality: 50}).toBuffer()
+    const logoImage = await sharp(Buffer.from(imageData, 'base64')).resize({ width: 250 }).toBuffer()
+    return sharp(__dirname + '/../static/Sachet.png')
+      .composite([{ input: await sharp(logoImage).toBuffer(), top: 160, left: 75 }]).jpeg({ quality: 50 }).toBuffer()
+  }
+
+  static getDefaultSachetImageUrl() {
+    return __dirname + '/../static/SachetDefault.jpg'
   }
 }
 

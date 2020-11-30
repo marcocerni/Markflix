@@ -323,43 +323,46 @@ class SachetController {
     const lineErrors = []
 
     const sachets = await Promise.all(csv.map(async (line, index) => {
-      const sachet = new Sachet()
+      const [email, url, logo] = line
 
-      sachet.logo = line[2]
-      sachet.email = line[0].trim()
-      sachet.opacity = 50
-      sachet.backBackgroundColor = '#ffffff'
-      sachet.backBackgroundOpacity = 100
-      sachet.backColor = '#000000'
-      sachet.frontBackgroundColor = '#ffffff'
-      sachet.frontBackgroundOpacity = 100
-      sachet.frontColor = '#000000'
+      if (logo) {
+        const sachet = new Sachet()
 
-      const errors = await validate(sachet)
-      if (errors.length > 0) {
-        lineErrors.push({
-          i: (index + 1),
-          errors: errors.map((error: ValidationError) => error.toString()).join(', '),
-        })
+        sachet.logo = logo
+        sachet.email = email.trim()
+
+        const errors = await validate(sachet)
+        if (errors.length > 0) {
+          lineErrors.push({
+            i: (index + 1),
+            errors: errors.map((error: ValidationError) => error.toString()).join(', '),
+          })
+        }
+
+        const sachetRepository = getRepository(Sachet)
+        try {
+          await sachetRepository.save(sachet)
+
+          sachet.hashedId = hashids.encode(sachet.id)
+          sachet.link = `${config.host}/?id=${sachet.hashedId}`
+        } catch (e) {
+          return res.status(409).send(e.message)
+        }
+
+        return sachet
+      } else {
+        const sachet = new Sachet()
+        sachet.email = email.trim()
+        sachet.link = config.host
+
+        return sachet
       }
-
-      const sachetRepository = getRepository(Sachet)
-      try {
-        await sachetRepository.save(sachet)
-
-        sachet.hashedId = hashids.encode(sachet.id)
-        sachet.link = `${config.host}/?id=${sachet.hashedId}`
-      } catch (e) {
-        return res.status(409).send(e.message)
-      }
-
-      return sachet
     }))
 
     if (sendEmails === 'true') {
-      console.time('entro email')
-      const emailService = new EmailService(provider)
+      console.time('Sending emails')
 
+      const emailService = new EmailService(provider)
       await emailService.init()
 
       await Promise.all(sachets.map((sachet: Sachet, index) => {
@@ -372,10 +375,12 @@ class SachetController {
           })
       }))
 
-      console.timeEnd('entro email')
+      console.timeEnd('Sending emails')
     }
 
-    res.status(200).send({ errors: lineErrors, sachets: sachets })
+    res
+      .status(200)
+      .send({ errors: lineErrors, sachets: sachets })
   }
 }
 

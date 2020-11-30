@@ -368,12 +368,18 @@ $(document).on('change', '#csv-file', (e) => {
 
     loadFileAsText(e.target.files[0]).then((fileString) => {
       fileString = fileString.replace(/;base64/g, '!base64!')
+      const hasImage =
 
-      csv = CSVToArray(fileString, ';').filter(line => line.length > 1 && line[2].includes('base64')).map((line) => {
-        line[2] = line[2].replace(/!base64!/g, ';base64')
+        csv = CSVToArray(fileString, ';')
+          .filter(line => line.length === 1 || (line[2].includes('base64') && line.length > 1))
+          .map((line) => {
+            line[0] = line[0].toLowerCase().trim()
 
-        return line
-      })
+            if (line[2])
+              line[2] = line[2].replace(/!base64!/g, ';base64')
+
+            return line
+          })
 
       $('#email-extensions').html('')
       updateCsvLines(csv.length)
@@ -394,7 +400,7 @@ $(document).on('change', '#csv-file', (e) => {
       })
 
       const html = csv.reduce((html, line, index) => {
-        const email = line[0].toLowerCase().trim()
+        const [email, url, logo, id, link] = line
 
         const hasSomeRegex = domainsRegex.some(domainRegex => domainRegex.test(email))
         const isInBlacklist = emails.includes(email)
@@ -404,17 +410,17 @@ $(document).on('change', '#csv-file', (e) => {
 
         html += `<tr>
             <td>
-            <div class="form-group form-check">
-            <input type="checkbox" class="form-check-input check-row" 
-            data-index="${index}" data-email="${email}" ${checked ? 'checked' : ''}>
-            </div>
+              <div class="form-group form-check">
+                <input type="checkbox" class="form-check-input check-row" 
+                data-index="${index}" data-email="${email}" ${checked ? 'checked' : ''}>
+              </div>
             </td>
             <td>${index + 1}</td>
             <td>${email}</td>
-            <td>${line[1]}</td>
-            <td><img src="${line[2]}" class="logo-image"/></td>
-            <td>${line[3] ? line[3] : ''}</td>
-            <td>${line[4] ? `<a href="${line[4]}" target="_blank">${line[4]}</a>` : ''}</td>
+            <td>${url ? url : ''}</td>
+            <td><img src="${logo ? logo : 'objects/logoExample.png'}" class="logo-image"/></td>
+            <td>${id ? id : ''}</td>
+            <td>${link ? `<a href="${link}" target="_blank">${link}</a>` : ''}</td>
         </tr>`
 
         return html
@@ -529,7 +535,7 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
           const rowNumber = selectedRows[index + (indexChunk * 100)]
           const tds = $($('.csv-content tr').get(rowNumber)).find('td')
 
-          tds[tds.length - 2].innerHTML = sachet.id
+          tds[tds.length - 2].innerHTML = sachet.id ? sachet.id : ''
           tds[tds.length - 1].innerHTML = `<a href="${sachet.link}" target="_blank">${sachet.link}</a>`
 
           csv[rowNumber].push(sachet.id, sachet.link)

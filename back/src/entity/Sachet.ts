@@ -57,6 +57,16 @@ export class Sachet {
     @UpdateDateColumn()
     updatedAt: Date;
 
+    constructor() {
+        this.opacity = 50
+        this.backBackgroundColor = '#ffffff'
+        this.backBackgroundOpacity = 100
+        this.backColor = '#000000'
+        this.frontBackgroundColor = '#ffffff'
+        this.frontBackgroundOpacity = 100
+        this.frontColor = '#000000'
+    }
+
     link: string
     hashedId: string
 }
