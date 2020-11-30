@@ -8,11 +8,13 @@ import { UnsubscribedEmail } from '../entity/UnsubscribedEmail'
 export class EmailService {
   private transporter: any
   private fromUser: any
+  private avoidDuplicates: boolean
   private unsubscribedEmails: string[]
 
-  constructor(emailProvider: 'gmail' | 'sendinblue' | 'sendgrid' = 'gmail') {
+  constructor(emailProvider: 'gmail' | 'sendinblue' | 'sendgrid' = 'gmail', avoidDuplicates = true) {
     const providerConfig = config.emailProviders[emailProvider] ?? config.emailProviders.gmail
     this.fromUser = providerConfig.fromUser
+    this.avoidDuplicates = avoidDuplicates
 
     this.transporter = nodemailer.createTransport({
       service: providerConfig.service,
@@ -41,7 +43,7 @@ export class EmailService {
 
     const sachet = await sachetRepository.findOne({ where: { email: toEmail } })
 
-    if (massive && sachet) {
+    if (massive && sachet && this.avoidDuplicates) {
       throw new Error(`Email already in the database: ${toEmail}`)
     }
 

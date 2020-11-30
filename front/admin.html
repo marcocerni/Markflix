@@ -69,7 +69,7 @@
             }
         }
 
-        h1 {
+        h1, label.color-blue {
             color: #205685;
         }
 
@@ -96,6 +96,10 @@
 
         .table-hover tbody tr {
             cursor: pointer;
+        }
+
+        .align-right {
+            text-align: right;
         }
 
     </style>
@@ -146,19 +150,37 @@
                         <label class="lead d-block">✉️ Email provider</label>
                         <div class="btn-group btn-group-toggle" data-toggle="buttons">
                             <label class="btn btn-secondary active">
-                                <input type="radio" name="provider" id="provider-option1" value="sendinblue" autocomplete="off" checked> SendinBlue
+                                <input type="radio" name="provider" id="provider-option1" value="sendinblue"
+                                       autocomplete="off" checked> SendinBlue
                             </label>
                             <label class="btn btn-secondary">
-                                <input type="radio" name="provider" id="provider-option2" value="sendgrid"  autocomplete="off"> SendGrid
+                                <input type="radio" name="provider" id="provider-option2" value="sendgrid"
+                                       autocomplete="off"> SendGrid
                             </label>
                             <label class="btn btn-secondary">
-                                <input type="radio" name="provider" id="provider-option3" value="gmail"  autocomplete="off"> Gmail
+                                <input type="radio" name="provider" id="provider-option3" value="gmail"
+                                       autocomplete="off"> Gmail
                             </label>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="csv-file" class="lead"> 📁 Fichier CSV</label>
+                        <div class="row">
+                            <div class="col-6">
+                                <label for="csv-file" class="lead color-blue"> 📁 Fichier CSV</label>
+                            </div>
+                            <div class="col-6 align-right">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="AD" checked
+                                           id="avoid-duplicates" name="avoid-duplicates">
+                                    <label class="lead color-blue" for="avoid-duplicates">
+                                        Éviter les doublons
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+
                         <div class="input-group">
                             <div class="custom-file">
                                 <input type="file" class="custom-file-input" id="csv-file" name="csv-file"
@@ -215,27 +237,6 @@
                                     <th scope="col">Generated ID</th>
                                     <th scope="col">Generated Link</th>
                                 </tr>
-<!--                                <tr>-->
-<!--                                    <th scope="col" colspan="2">-->
-<!--                                        <button class="btn btn-primary filter-rows" type="button">-->
-<!--                                            Filtrer-->
-<!--                                            <i class="fa fa-filter"></i>-->
-<!--                                        </button>-->
-<!--                                    </th>-->
-<!--                                    <th scope="col">-->
-<!--                                        <input type="text"-->
-<!--                                               class="form-control"-->
-<!--                                               placeholder="Par example 'gouv.fr,.us,.pl'"-->
-<!--                                               id="email-extensions"/>-->
-<!--                                    </th>-->
-<!--                                    <th scope="col"></th>-->
-<!--                                    <th scope="col" colspan="3" class="text-right">-->
-<!--                                        <button class="btn btn-primary filter-rows" type="button">-->
-<!--                                            Filtrer-->
-<!--                                            <i class="fa fa-filter"></i>-->
-<!--                                        </button>-->
-<!--                                    </th>-->
-<!--                                </tr>-->
                                 </thead>
                                 <tbody class="csv-content">
                                 <tr>

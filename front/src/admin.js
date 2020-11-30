@@ -371,52 +371,55 @@ $(document).on('dblclick', '.table-hover tbody tr', function() {
 })
 
 $(document).on('change', '#csv-file', (e) => {
-  if (e.target.files && e.target.files.length) {
-    fileName = e.target.files[0].name
-    $(e.target).next('label').html(fileName)
+  if (!e.target.files || !e.target.files.length) {
+    return
+  }
 
-    loadFileAsText(e.target.files[0]).then((fileString) => {
-      fileString = fileString.replace(/;base64/g, '!base64!')
+  fileName = e.target.files[0].name
+  $(e.target).next('label').html(fileName)
 
-      csv = CSVToArray(fileString, ';')
-        .filter(line => line.length === 1 || (line[2].includes('base64') && line.length > 1))
-        .map((line) => {
-          line[0] = line[0].toLowerCase().trim()
+  loadFileAsText(e.target.files[0]).then((fileString) => {
+    fileString = fileString.replace(/;base64/g, '!base64!')
 
-          if (line[2])
-            line[2] = line[2].replace(/!base64!/g, ';base64')
+    csv = CSVToArray(fileString, ';')
+      .filter(line => (line.length === 1 && line[0].trim()) || (line.length > 1 && line[2].includes('base64')))
+      .map((line) => {
+        line[0] = line[0].toLowerCase().trim()
 
-          return line
-        })
+        if (line[2])
+          line[2] = line[2].replace(/!base64!/g, ';base64')
 
-      $('#email-extensions').html('')
-      updateCsvLines(csv.length)
-
-      let count = 0
-
-      const regexBase = '[a-zA-Z\\-0-9\\.]+@[a-zA-Z\\-0-9\\.]*'
-      const starRegex = '(\\.|\\+|\\-|@|\\w)*'
-
-      const domainsRegex = domains.map(domain => {
-        const domainReplaced = domain.replace(/\./g, '\\.').replace(/\*/g, starRegex).toString()
-
-        if (domain.endsWith('*') || domain.startsWith('*')) {
-          return new RegExp(domainReplaced)
-        } else {
-          return new RegExp(regexBase + domainReplaced)
-        }
+        return line
       })
 
-      const html = csv.reduce((html, line, index) => {
-        const [email, url, logo, id, link] = line
+    $('#email-extensions').html('')
+    updateCsvLines(csv.length)
 
-        const hasSomeRegex = domainsRegex.some(domainRegex => domainRegex.test(email))
-        const isInBlacklist = emails.includes(email)
-        const checked = !(hasSomeRegex || isInBlacklist)
+    let count = 0
 
-        if (checked) count++
+    const regexBase = '[a-zA-Z\\-0-9\\.]+@[a-zA-Z\\-0-9\\.]*'
+    const starRegex = '(\\.|\\+|\\-|@|\\w)*'
 
-        html += `<tr>
+    const domainsRegex = domains.map(domain => {
+      const domainReplaced = domain.replace(/\./g, '\\.').replace(/\*/g, starRegex).toString()
+
+      if (domain.endsWith('*') || domain.startsWith('*')) {
+        return new RegExp(domainReplaced)
+      } else {
+        return new RegExp(regexBase + domainReplaced)
+      }
+    })
+
+    const html = csv.reduce((html, line, index) => {
+      const [email, url, logo, id, link] = line
+
+      const hasSomeRegex = domainsRegex.some(domainRegex => domainRegex.test(email))
+      const isInBlacklist = emails.includes(email)
+      const checked = !(hasSomeRegex || isInBlacklist)
+
+      if (checked) count++
+
+      html += `<tr>
             <td>
               <div class="form-group form-check">
                 <input type="checkbox" class="form-check-input check-row" 
@@ -431,30 +434,31 @@ $(document).on('change', '#csv-file', (e) => {
             <td>${link ? `<a href="${link}" target="_blank">${link}</a>` : ''}</td>
         </tr>`
 
-        return html
-      }, '')
+      return html
+    }, '')
 
-      $('#send-emails').prop('disabled', csv.length === 0)
-      $('#save-sachets').prop('disabled', csv.length === 0)
-      $('#download-rows').prop('disabled', csv.length === 0)
+    $('#send-emails').prop('disabled', csv.length === 0)
+    $('#save-sachets').prop('disabled', csv.length === 0)
+    $('#download-rows').prop('disabled', csv.length === 0)
 
-      $('.csv-content').html(html)
-      updateCsvLines(count)
-    }).catch(error => {
-      Toastify({
-        text: 'Error on file',
-        duration: 3000,
-        backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
-      }).showToast()
+    $('.csv-content').html(html)
+    updateCsvLines(count)
+  }).catch(error => {
+    Toastify({
+      text: 'Error on file',
+      duration: 3000,
+      backgroundColor: 'linear-gradient(to right, rgb(255, 95, 109), rgb(255, 195, 113))',
+    }).showToast()
 
-      console.error(error)
+    console.error(error)
 
-      $('#send-emails').prop('disabled', false)
-      $('#save-sachets').prop('disabled', false)
-      $('#download-rows').prop('disabled', false)
-      // $('.download-images').prop('disabled', false)
-    })
-  }
+    $('#send-emails').prop('disabled', false)
+    $('#save-sachets').prop('disabled', false)
+    $('#download-rows').prop('disabled', false)
+    // $('.download-images').prop('disabled', false)
+  })
+
+  e.target.value = ''
 })
 
 document.getElementById('download-rows').addEventListener('click', function() {
@@ -536,6 +540,7 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
           csv: sachetChunk,
           sendEmails: sendEmails,
           provider: $('[name="provider"]').val(),
+          avoidDuplicates: $('[name="avoid-duplicates"]').prop('checked'),
         },
       }).then((response) => {
 
