@@ -361,7 +361,7 @@ function updateCsvLines(filteredLines) {
   $('.lines-detail').html(`(${filteredLines} de ${csv.length})`)
 }
 
-$(document).on('click', '.table-hover tbody tr', function() {
+$(document).on('dblclick', '.table-hover tbody tr', function() {
   const $this = $(this)
   const $checkbox = $this.find('[type="checkbox"]')
 
