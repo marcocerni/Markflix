@@ -361,6 +361,15 @@ function updateCsvLines(filteredLines) {
   $('.lines-detail').html(`(${filteredLines} de ${csv.length})`)
 }
 
+$(document).on('click', '.table-hover tbody tr', function() {
+  const $this = $(this)
+  const $checkbox = $this.find('[type="checkbox"]')
+
+  if ($checkbox) {
+    $checkbox.prop('checked', !$checkbox.prop('checked'))
+  }
+})
+
 $(document).on('change', '#csv-file', (e) => {
   if (e.target.files && e.target.files.length) {
     fileName = e.target.files[0].name
@@ -368,18 +377,17 @@ $(document).on('change', '#csv-file', (e) => {
 
     loadFileAsText(e.target.files[0]).then((fileString) => {
       fileString = fileString.replace(/;base64/g, '!base64!')
-      const hasImage =
 
-        csv = CSVToArray(fileString, ';')
-          .filter(line => line.length === 1 || (line[2].includes('base64') && line.length > 1))
-          .map((line) => {
-            line[0] = line[0].toLowerCase().trim()
+      csv = CSVToArray(fileString, ';')
+        .filter(line => line.length === 1 || (line[2].includes('base64') && line.length > 1))
+        .map((line) => {
+          line[0] = line[0].toLowerCase().trim()
 
-            if (line[2])
-              line[2] = line[2].replace(/!base64!/g, ';base64')
+          if (line[2])
+            line[2] = line[2].replace(/!base64!/g, ';base64')
 
-            return line
-          })
+          return line
+        })
 
       $('#email-extensions').html('')
       updateCsvLines(csv.length)
@@ -625,7 +633,6 @@ $(document).on('change', '.check-row', function(event) {
   const $checkbox = $(event.target)
   const checked = $checkbox.prop('checked')
   const email = $checkbox.data('email')
-
 
   if (!checked) {
     checkboxEmails.push(email)
