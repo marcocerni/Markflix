@@ -551,7 +551,8 @@ $(document).on('click', '#send-emails, #save-sachets', async (e) => {
           tds[tds.length - 2].innerHTML = sachet.id ? sachet.id : ''
           tds[tds.length - 1].innerHTML = `<a href="${sachet.link}" target="_blank">${sachet.link}</a>`
 
-          csv[rowNumber].push(sachet.id, sachet.link)
+          if (sachet.id)
+            csv[rowNumber].push(sachet.id, sachet.link)
         })
 
         if (response.errors.length) {
@@ -710,9 +711,7 @@ $('.form-blacklist').submit(async function(e) {
 
     const fileString = await loadFileAsText(csvInput.files[0])
 
-    csv = CSVToArray(fileString, ';')
-
-    mails = csv.map(line => line[0])
+    mails = CSVToArray(fileString, ';').map(line => line[0])
   } else {
     mails = [$email.val()]
   }
