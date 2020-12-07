@@ -403,10 +403,11 @@ $(document).on('change', '#csv-file', (e) => {
     const domainsRegex = domains.map(domain => {
       const domainReplaced = domain.replace(/\./g, '\\.').replace(/\*/g, starRegex).toString()
 
+      console.log(domain, domain.endsWith('*'), domain.startsWith('*'), domainReplaced);
       if (domain.endsWith('*') || domain.startsWith('*')) {
-        return new RegExp(domainReplaced)
+        return new RegExp(domainReplaced + '$')
       } else {
-        return new RegExp(regexBase + domainReplaced)
+        return new RegExp(regexBase + domainReplaced + '$')
       }
     })
 
