@@ -2,9 +2,9 @@ module.exports = {
    "type": "mysql",
    "host": "localhost",
    "port": 3306,
-   "username": "gelplusfrance",
-   "password": "gelplusfrance",
-   "database": "gelplusfrance",
+   "username": "markflix",
+   "password": "markflix",
+   "database": "markflix",
    "synchronize": true,
    "logging": false,
    "entities": [
