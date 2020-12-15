@@ -11,6 +11,7 @@ import MoviePlay from './components/MoviePlay'
 import Search from './components/Search'
 
 import './App.css';
+import Footer from "./components/Footer";
 
 require('dotenv').config();
 
@@ -26,6 +27,7 @@ function App() {
           <Route path="/play/:id" component={MoviePlay} />
           <Route path="/search" component={Search} />
         </div>
+          <Footer />
       </Router>
   );
 }
